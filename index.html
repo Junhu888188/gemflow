@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Gemflow: Crystal Energy</title>
+<meta name="description" content="Your phone, a living crystal. Four gemstones that breathe, glow and flow with you. Coming soon to Android.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3CradialGradient id=%22g%22 cx=%22.4%22 cy=%22.35%22%3E%3Cstop offset=%220%22 stop-color=%22%23b8ffe0%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%2300c070%22/%3E%3Cstop offset=%221%22 stop-color=%22%23003a26%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22url(%23g)%22/%3E%3C/svg%3E">
+<meta property="og:title" content="Gemflow: Crystal Energy">
+<meta property="og:description" content="Your phone, a living crystal. Join the waitlist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --accent: #2fe39a; }
+  * { box-sizing: border-box; }
+  html { background: #000; }
+  html, body { height: 100%; overflow: hidden; touch-action: none; }
+  body { margin: 0; color: #fff; font-family: Inter, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+
+  /* 宝石铺满全屏，固定在背后；文字一屏一句，滚动切换 */
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+  .scrim { position: fixed; left: 0; right: 0; bottom: 0; height: 55vh; background: linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,0)); pointer-events: none; z-index: 1; }
+
+  .brand { position: fixed; top: calc(26px + env(safe-area-inset-top)); left: 32px; margin: 0; z-index: 3; font-family: "Cormorant Garamond", serif; font-weight: 400; letter-spacing: .42em; font-size: 14px; text-shadow: 0 1px 12px rgba(0,0,0,.4); }
+
+  .dots { position: fixed; right: 26px; top: 50%; transform: translateY(-50%); z-index: 3; display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .dots a { display: block; width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); transition: background .5s, transform .5s; }
+  .dots a.on { background: #fff; transform: scale(1.35); }
+
+  .hero { position: relative; z-index: 2; height: 100vh; height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 32px calc(9vh + env(safe-area-inset-bottom)); max-width: 820px; }
+  .lines { position: relative; height: 2.3em; font-family: "Cormorant Garamond", serif; font-size: clamp(38px, 6.2vw, 76px); margin-bottom: 34px; }
+  .line { position: absolute; left: 0; bottom: 0; opacity: 0; transform: translateY(10px); transition: opacity 3s ease, transform 3.2s ease; text-shadow: 0 1px 18px rgba(0,0,0,.35); pointer-events: none; }
+  .line.on { opacity: 1; transform: none; transition: opacity 1.8s ease 3.5s, transform 2s ease 3.5s; }
+  .name { font-family: Inter, sans-serif; font-size: 12px; letter-spacing: .32em; text-transform: uppercase; opacity: .78; margin: 0 0 16px; }
+  h2 { font-weight: 300; font-size: 1em; line-height: 1.04; letter-spacing: -.01em; margin: 0; max-width: 13em; }
+  h2 em { font-style: italic; }
+  .tag { font-size: 13px; letter-spacing: .04em; color: rgba(255,255,255,.7); margin: 0 0 14px; font-weight: 300; }
+  .join { font: inherit; font-size: 15px; font-weight: 500; color: #04140d; background: #fff; border: 0; border-radius: 999px; padding: 13px 24px; cursor: pointer; transition: box-shadow .4s; align-self: flex-start; }
+  .join:hover { box-shadow: 0 0 24px var(--accent); }
+  .joinbox[hidden], .join[hidden] { display: none; }
+
+  /* waitlist：默认只是一个按钮，点开才出输入框 */
+  form { display: flex; gap: 8px; max-width: 440px; }
+  input[type=email] { flex: 1; min-width: 0; font: inherit; font-size: 15px; color: #fff; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 13px 18px; outline: none; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  input[type=email]::placeholder { color: rgba(255,255,255,.55); }
+  input[type=email]:focus { border-color: #fff; }
+  form button { font: inherit; font-size: 15px; font-weight: 500; color: #04140d; background: #fff; border: 0; border-radius: 999px; padding: 13px 22px; cursor: pointer; white-space: nowrap; transition: box-shadow .4s; }
+  form button:hover { box-shadow: 0 0 24px var(--accent); }
+  .hp { position: absolute; left: -9999px; }
+  .note { font-size: 12px; color: rgba(255,255,255,.55); margin: 12px 0 0; min-height: 1.4em; }
+  .note.ok { color: #fff; font-size: 14px; }
+  .foot { font-size: 11px; color: rgba(255,255,255,.4); margin: 22px 0 0; }
+
+  @media (max-width: 600px) {
+    .brand { left: 20px; font-size: 13px; }
+    .dots { right: 14px; gap: 10px; }
+    .hero { padding: 0 20px calc(7vh + env(safe-area-inset-bottom)); }
+    .lines { font-size: 34px; height: 2.4em; margin-bottom: 28px; }
+    h2 { max-width: calc(100vw - 60px); }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="scrim"></div>
+<p class="brand">GEMFLOW</p>
+<ul class="dots" id="dots"></ul>
+
+<main class="hero">
+  <div class="lines" id="lines">
+    <div class="line on"><p class="name">Emerald</p><h2>Your phone, a <em>living</em> crystal.</h2></div>
+    <div class="line"><p class="name">Ruby</p><h2>It <em>breathes</em>, glows and flows with you.</h2></div>
+    <div class="line"><p class="name">Sapphire</p><h2>On your <em>call screen</em>. On your lock screen.</h2></div>
+    <div class="line"><p class="name">Amethyst</p><h2>A one-minute <em>breathing</em> ritual.</h2></div>
+  </div>
+  <p class="tag">Touch the stone · move the light · Coming soon to Android</p>
+  <button class="join" id="joinBtn" type="button">Join the waitlist</button>
+  <div class="joinbox" id="joinbox" hidden>
+    <form id="wl">
+      <input type="hidden" name="gem" id="gemField" value="emerald">
+      <p class="hp"><label>Company <input name="company" tabindex="-1" autocomplete="off"></label></p>
+      <input type="email" name="email" required placeholder="your@email.com" aria-label="Email address" autocomplete="email">
+      <button type="submit">Join</button>
+    </form>
+    <p class="note" id="note">One email at launch. No spam.</p>
+  </div>
+  <p class="foot">© 2026 Gemflow · <a href="mailto:hello@gemflowcrystal.com">hello@gemflowcrystal.com</a></p>
+</main>
+
+<script id="fs-emerald" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  float t = T;
+
+  float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
+  float glow  = exp(-r1*r1*3.);                  // 大面积柔光
+  float glowC = exp(-r1*r1*7.);                  // 光心
+  float glow2 = exp(-r2*r2*3.2) * .3;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (.62 + .1*breath);
+  L += light * (garden - .45) * .07;
+  L += light * caus * .06;
+  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * .85;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(0., .3, .22);
+  vec3 lit   = vec3(.02, .74, .36);
+  vec3 col = mix(dark, lit, smoothstep(0., .9, light)) * L;
+  col += vec3(.62, 1., .45) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
+  col.r += max(L - 1., 0.) * .32; col.b += max(L - 1., 0.) * .05;
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(0., .26, .17) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  col += vec3(.03, .2, .13) * sh;
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  col += vec3(0., .42, .26) * exp(-rm*rm*6.) * .3;
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  col += vec3(0., .38, .24) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.6, 1., .5) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-ruby" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  float t = T;
+
+  float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
+  float glow  = exp(-r1*r1*4.6);                  // 大面积柔光
+  float glowC = exp(-r1*r1*11.);                  // 光心
+  float glow2 = exp(-r2*r2*3.2) * .3;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (.62 + .1*breath);
+  float clearZ = smoothstep(.3, .9, light);                     // 玻璃感：受光区清澈，不带云雾
+  L += light * (garden - .45) * .07;
+  L += light * caus * .06;
+  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.6) * 1.22;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(.34, 0., .06);    // 深酒红
+  vec3 lit   = mix(vec3(.96, .02, .17), vec3(1., .05, .1), smoothstep(.35, .65, deep));   // 参照真实红宝石：正红略偏冷（约 -6°）   // 二色性：紫红 ↔ 橙红
+  // 比尔-朗伯透光：光在宝石里走得越远，被吸收得越多 → 厚处深而纯，薄处（光心）透亮偏白
+  float thick = mix(2.4, .6, smoothstep(0., 1.5, L)) * (.9 + .2*deep);
+  vec3 col = (L*.98 + .05) * exp(-vec3(.1, 2.5, 1.55) * thick);
+  col += vec3(1., .5, .55) * glowC * glowC * (.1 + .03*breath);   // 光心白色减弱一半
+  col.g += max(L - 1., 0.) * .13; col.b += max(L - 1., 0.) * .09;   // 溢出的白也减弱约 40%
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(.36, 0., .055) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  col += vec3(.26, .03, .06) * sh;
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  col += vec3(.68, .01, .1) * exp(-rm*rm*6.) * .3;
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  col += vec3(.62, .01, .09) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(1., .5, .55) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-sapphire" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  float t = T;
+
+  float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
+  float glow  = exp(-r1*r1*3.);                  // 大面积柔光
+  float glowC = exp(-r1*r1*7.);                  // 光心
+  float glow2 = exp(-r2*r2*3.2) * .3;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (.62 + .1*breath);
+  L += light * (garden - .45) * .07;
+  L += light * caus * .06;
+  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * 1.2;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(0., .03, .38);
+  vec3 lit   = vec3(.08, .28, 1.);
+  vec3 col = mix(dark, lit, smoothstep(0., .9, light)) * L;
+  col += vec3(.72, .8, 1.) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
+  col.r += max(L - 1., 0.) * .38; col.g += max(L - 1., 0.) * .3;
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(0., .08, .5) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  col += vec3(.05, .13, .38) * sh;
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  col += vec3(.03, .2, .75) * exp(-rm*rm*6.) * .3;
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  col += vec3(.03, .18, .7) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.5, .72, 1.) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-amethyst" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  float t = T;
+
+  float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
+  float glow  = exp(-r1*r1*4.8);                  // 大面积柔光（紫色收小：蓝光几乎不被吸收，外围显得更大）
+  float glowC = exp(-r1*r1*10.);                  // 光心
+  float glow2 = exp(-r2*r2*4.6) * .26;   // 第二光斑也收小
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (.62 + .1*breath);
+  float clearZ = smoothstep(.3, .9, light);                     // 玻璃感：受光区清澈，不带云雾
+  L += light * (garden - .45) * .07;
+  L += light * caus * .06;
+  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * 1.25;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(.13, 0., .3);
+  vec3 lit   = mix(vec3(.42, .06, 1.), vec3(.66, .04, .92), smoothstep(.35, .65, deep));   // 二色性：蓝紫 ↔ 红紫
+  // 比尔-朗伯透光：光在宝石里走得越远，被吸收得越多 → 厚处深而纯，薄处（光心）透亮偏白
+  float thick = mix(2.4, .45, smoothstep(.12, 1.4, L)) * (.9 + .2*deep);   // 光心更"薄" → 更透
+  // 红、蓝同比例吸收，再乘紫水晶固定色调 → 从暗到光心色相始终一致，只有明暗/白度变化
+  vec3 col = (L*1.21 + .05) * exp(-vec3(.22, 2.6, .22) * thick) * vec3(.64, 1., 1.);   // 光斑提亮约 10%
+  col += vec3(.78, .64, 1.) * glowC * glowC * (.2 + .06*breath);   // 带紫的白   // 光心透出暖白
+  col.g += max(L - 1., 0.) * .2; col.r += max(L - 1., 0.) * .1;   // 红绿一起溢出，保持紫色平衡
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(.22, .0, .3) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  col += vec3(.2, .06, .34) * sh;
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  col += vec3(.52, .02, .68) * exp(-rm*rm*8.5) * .22;   // 对侧反射光也收小
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  col += vec3(.48, .02, .62) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.85, .6, 1.) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  // 控制冲白的程度：光心可以亮成很淡、很透的紫白，但绿通道不超过蓝的 62% → 不会变成纯白
+  // 保持色相：亮到顶时等比例收住（红蓝比例不变），多出的亮度只以淡紫白叠加 → 光心不滑向粉红
+  float mxv = max(col.r, max(col.g, col.b));
+  if (mxv > 1.) col = col / mxv + vec3(.72, .62, 1.) * (mxv - 1.) * .3;
+  col.g = min(col.g, .52 * max(col.b, col.r*.9));
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+
+<script>
+// Google 表格 Apps Script 部署后的链接，填在这里
+const WAITLIST_URL = '';
+
+const GEMS = [
+  { id: 'emerald',  c: '#2fe39a' },
+  { id: 'ruby',     c: '#ff2f5a' },
+  { id: 'sapphire', c: '#4a7dff' },
+  { id: 'amethyst', c: '#b46dff' },
+];
+
+const cv = document.getElementById('c');
+const gl = cv.getContext('webgl2', { antialias: false, powerPreference: 'low-power' });
+let progs = [];
+if (gl) {
+  const mk = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s; };
+  const vs = mk(gl.VERTEX_SHADER, `#version 300 es
+in vec2 a; void main(){ gl_Position = vec4(a,0,1); }`);
+  progs = GEMS.map(g => {
+    const p = gl.createProgram();
+    gl.attachShader(p, vs);
+    gl.attachShader(p, mk(gl.FRAGMENT_SHADER, document.getElementById('fs-' + g.id).textContent.trim()));
+    gl.bindAttribLocation(p, 0, 'a');
+    gl.linkProgram(p);
+    const U = n => gl.getUniformLocation(p, n);
+    return { p, R: U('R'), T: U('T'), W: U('W'), P: U('P'), K: U('PK') };
+  });
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+} else {
+  cv.style.background = 'radial-gradient(circle at 50% 45%, #0b8a5a, #02281c 70%)';
+}
+
+const DPR = Math.min(devicePixelRatio || 1, innerWidth < 820 ? 1.25 : 1.5);
+function resize() {
+  cv.width = Math.max(1, innerWidth * DPR | 0); cv.height = Math.max(1, innerHeight * DPR | 0);
+  if (gl) gl.viewport(0, 0, cv.width, cv.height);
+}
+addEventListener('resize', resize); resize();
+
+// —— 明灭过渡：旧宝石从边缘向中心熄灭 → 换色 → 新宝石从中心亮起 ——
+let cur = 0, want = 0, ph = 0, W = 0;  // ph: 过渡进度 0 = 全暗, 1 = 全亮；W 传给 shader
+const FADE_IN = 2.2, FADE_OUT = 3.5;   // 明、灭同一条缓动曲线（互为倒放），灭更慢
+const HOLD = 10000;                     // 每种颜色停留 10 秒
+const lines = [...document.querySelectorAll('.line')];
+const dots = document.getElementById('dots');
+GEMS.forEach((g, i) => {
+  const li = document.createElement('li');
+  li.innerHTML = `<a href="#" aria-label="${lines[i].querySelector('.name').textContent}"${i === 0 ? ' class="on"' : ''}></a>`;
+  li.firstChild.onclick = e => { e.preventDefault(); go(i); };
+  dots.appendChild(li);
+});
+let timer;
+function go(i) {
+  want = i;
+  lines.forEach((l, j) => l.classList.toggle('on', j === i));
+  dots.querySelectorAll('a').forEach((a, j) => a.classList.toggle('on', j === i));
+  clearTimeout(timer); timer = setTimeout(() => go((want + 1) % GEMS.length), HOLD);
+}
+go(0);
+
+// 触摸引导能量：手机上按住拖动，电脑上鼠标移动，光团跟随；松开后回到自己的轨迹
+let target = [0, 0], pos = [0, 0], k = 0, lastMove = 0, touching = false;
+const toUv = e => [(e.clientX - innerWidth / 2) / innerHeight, -(e.clientY - innerHeight / 2) / innerHeight];
+const onUi = e => e.target.closest('button, input, a, form');
+addEventListener('pointerdown', e => {
+  if (onUi(e) || e.pointerType === 'mouse') return;
+  touching = true; target = toUv(e); if (k < .05) pos = target.slice(); lastMove = performance.now();
+});
+addEventListener('pointermove', e => {
+  if (e.pointerType === 'mouse' || touching) { target = toUv(e); lastMove = performance.now(); }
+});
+addEventListener('pointerup', () => { touching = false; });
+addEventListener('pointercancel', () => { touching = false; });
+document.addEventListener('pointerleave', () => { lastMove = 0; });
+
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min((now - prev) / 1000, .1); prev = now;
+  if (want !== cur) {
+    ph = Math.max(0, ph - dt / FADE_OUT);   // 灭：光从边缘收回中心
+    if (ph === 0) {
+      cur = want;
+      document.documentElement.style.setProperty('--accent', GEMS[cur].c);
+      document.getElementById('gemField').value = GEMS[cur].id;
+    }
+  } else {
+    ph = Math.min(1, ph + dt / FADE_IN);   // 明：光从中心向外铺开
+  }
+  W = .22 + 1. * ph * ph * (3 - 2 * ph);   // 只走 shader 里真正有明暗变化的区间（.22 中心留微光 → 1.22 全亮），不再整屏全黑、也不再先停顿后骤暗
+  const kw = touching ? .78 : now - lastMove < 900 ? .6 : 0;
+  k += (kw - k) * (1 - Math.exp(-dt * (kw > k ? 3 : 1.1)));
+  const f = 1 - Math.exp(-dt * 3);
+  pos[0] += (target[0] - pos[0]) * f; pos[1] += (target[1] - pos[1]) * f;
+  if (gl) {
+    const P = progs[cur];
+    gl.useProgram(P.p);
+    gl.uniform2f(P.R, cv.width, cv.height);
+    gl.uniform1f(P.T, now / 1000);
+    gl.uniform1f(P.W, W);
+    gl.uniform2f(P.P, pos[0], pos[1]);
+    gl.uniform1f(P.K, k);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// —— Waitlist → Google 表格 ——
+document.getElementById('joinBtn').onclick = e => {
+  e.target.hidden = true; document.getElementById('joinbox').hidden = false;
+  document.querySelector('#wl input[type=email]').focus();
+};
+const form = document.getElementById('wl'), note = document.getElementById('note');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (form.company.value) return;                 // 机器人
+  const btn = form.querySelector('button'); btn.disabled = true;
+  try {
+    if (!WAITLIST_URL) throw new Error('no endpoint');
+    await fetch(WAITLIST_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ email: form.email.value, gem: form.gem.value }) });
+    form.style.display = 'none';
+    note.textContent = `You're on the list. We'll write once, when Gemflow launches.`;
+    note.classList.add('ok');
+  } catch (err) {
+    note.textContent = 'Something went wrong — please try again in a moment.';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
