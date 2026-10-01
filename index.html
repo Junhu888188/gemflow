@@ -98,7 +98,7 @@ precision highp float;
 uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
 out vec4 o;
 
-float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float n(vec2 p){
   vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
   return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
@@ -121,14 +121,14 @@ void main(){
   // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
   vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
   vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
-  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  vec2 dv = uv - lp + wv*.29 + wv2*.1;
   float ang0 = atan(dv.y, dv.x);
   float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
   float r1 = length(dv * vec2(1., .8)) * lobes;
-  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
-  float glow  = exp(-r1*r1*3.);                  // 大面积柔光
-  float glowC = exp(-r1*r1*7.);                  // 光心
-  float glow2 = exp(-r2*r2*3.2) * .3;
+  float r2 = length((uv - lp2 + wv*.35) * vec2(1., .8));
+  float glow  = exp(-r1*r1*6.12);                  // 大面积柔光
+  float glowC = exp(-r1*r1*14.3);                  // 光心
+  float glow2 = exp(-r2*r2*6.53) * .3;
   float light = glow + glow2;
 
   // —— 宝石内部 ——
@@ -139,7 +139,7 @@ void main(){
   vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
   vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
   float garden = fbm(gp + 2.6*w);
-  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
   // 内部折射的柔和光纹（被光照到才显现）
   vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
   float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
@@ -165,12 +165,12 @@ void main(){
   col += vec3(0., .26, .17) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
-  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
   col += vec3(.03, .2, .13) * sh;
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(0., .42, .26) * exp(-rm*rm*6.) * .3;
+  col += vec3(0., .42, .26) * exp(-rm*rm*12.24) * .3;
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
@@ -205,92 +205,78 @@ void main(){
 </script>
 <script id="fs-ruby" type="x-shader/x-fragment">#version 300 es
 precision highp float;
-uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK;
 out vec4 o;
 
-float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float n(vec2 p){
   vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
   return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// 红宝石 · 通透版（试验，由蓝宝石通透 B 换色）：光形干净、亮区不叠烟雾纹理、Beer–Lambert 上色
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
 
-  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  // —— 光源路径与定稿相同 ——
   vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
                  .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
   lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
-  // 第二团更淡的光，走另一条路，让光感更丰富
   vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
 
-  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
-  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
-  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
-  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  // 光斑形状：只留很轻的低频扭曲（原来 .42+.14 的扭曲让光的轮廓本身变成了云/烟）
+  vec2 wv = vec2(fbm(uv*1.1 + vec2(t*.05, -t*.04)), fbm(uv*1.1 + vec2(7.3, 2.1) + vec2(-t*.04, t*.06))) - .5;
+  vec2 dv = uv - lp + wv*.11;
   float ang0 = atan(dv.y, dv.x);
-  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float lobes = 1. + .14*sin(ang0*2. + t*.23) + .08*sin(ang0*3. - t*.31 + 1.7);
   float r1 = length(dv * vec2(1., .8)) * lobes;
-  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
-  float glow  = exp(-r1*r1*4.6);                  // 大面积柔光
-  float glowC = exp(-r1*r1*11.);                  // 光心
-  float glow2 = exp(-r2*r2*3.2) * .3;
+  float r2 = length((uv - lp2 + wv*.14) * vec2(1., .8));
+  float glow  = exp(-r1*r1*8.6);                 // 半径 = 原来的 70%（系数 ×2.04）
+  float glowC = exp(-r1*r1*22.4);
+  float glow2 = exp(-r2*r2*9.4) * .26;
   float light = glow + glow2;
 
   // —— 宝石内部 ——
-  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
   vec2 par = -lp * .12;
   float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
-  // 花园包体：生命般的苔藓纹理，缓慢向上生长
-  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
-  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
-  float garden = fbm(gp + 2.6*w);
-  float veins  = smoothstep(.07, 0., abs(garden - .52));
-  // 内部折射的柔和光纹（被光照到才显现）
+  // 折射光纹：结构与运动和定稿完全一样，只在光里显现
   vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
   float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
 
-  // 暗处：深邃的祖母绿，仍保留纹理
-  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
-  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
-  L += light * (.62 + .1*breath);
-  float clearZ = smoothstep(.3, .9, light);                     // 玻璃感：受光区清澈，不带云雾
-  L += light * (garden - .45) * .07;
-  L += light * caus * .06;
-  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
-  L += glowC * .32;
-  L = max(L, .03);
-  L = pow(L, 1.6) * 1.22;                        // 压深暗部、保留光心 → 深沉又通透
+  // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
+  float L = .05 + .06*(deep - .5);
+  L += light * (.76 + .1*breath);
+  L += light * caus * .28;
+  L += glowC * .46;
+  L = max(L, 0.);
 
-  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
-  vec3 dark  = vec3(.34, 0., .06);    // 深酒红
-  vec3 lit   = mix(vec3(.96, .02, .17), vec3(1., .05, .1), smoothstep(.35, .65, deep));   // 参照真实红宝石：正红略偏冷（约 -6°）   // 二色性：紫红 ↔ 橙红
-  // 比尔-朗伯透光：光在宝石里走得越远，被吸收得越多 → 厚处深而纯，薄处（光心）透亮偏白
-  float thick = mix(2.4, .6, smoothstep(0., 1.5, L)) * (.9 + .2*deep);
-  vec3 col = (L*.98 + .05) * exp(-vec3(.1, 2.5, 1.55) * thick);
-  col += vec3(1., .5, .55) * glowC * glowC * (.1 + .03*breath);   // 光心白色减弱一半
-  col.g += max(L - 1., 0.) * .13; col.b += max(L - 1., 0.) * .09;   // 溢出的白也减弱约 40%
-  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
-  col += vec3(.36, 0., .055) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  // Beer–Lambert：越亮 = 光走的路径越短 → 厚处深皇家蓝，薄处明亮矢车菊蓝
+  float thick = mix(2.6, .5, smoothstep(0., 1.3, L));
+  vec3 absorb = vec3(.1, 2.6, 1.7);
+  absorb.b = mix(1.7, 1.45, smoothstep(.3, 1.3, L));   // 薄处蓝吸收少 → 透光偏玫瑰红（不走橙）
+  vec3 col = (L*.9 + .02) * exp(-absorb*thick);
+  col += vec3(1., .6, .7) * pow(glowC, 5.) * .25;   // 极小的透亮点
+  // 光没照到的地方：饱和的蓝宝石底色，不发黑
+  col += vec3(.17, 0., .03) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
 
-  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
-  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
-  col += vec3(.26, .03, .06) * sh;
+  // 抛光表面：一抹很淡的反光，随光反向移动
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
+  col += vec3(.18, .02, .05) * exp(-shd*shd);
 
-  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  // 内部反射：对侧一团淡淡的倒影光
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.68, .01, .1) * exp(-rm*rm*6.) * .3;
+  col += vec3(.6, .01, .1) * exp(-rm*rm*16.3) * .24;
 
-  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  // 边缘内反射：边缘聚光 → 晶体体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(.62, .01, .09) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+  col += vec3(.55, .01, .09) * smoothstep(.5, 1.15, ev) * rimSide * .3;
 
-  // 上升的生命光点：靠近光的地方更亮
+  // 光点：数量减少，只在光附近明显
   float motes = 0.;
   for (int k=0; k<2; k++) {
     float sc = k==0 ? 7. : 13.;
@@ -300,18 +286,28 @@ void main(){
     for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
       vec2 c = id + vec2(i,j);
       float r = h1(c + float(k)*11.);
-      if (r > .55) continue;
+      if (r > .3) continue;
       vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
       o2.x += .15*sin(t*.8 + r*30.);
       vec2 d = g - c - o2;
       float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
-      float size = k==0 ? .06 : .04;
+      float size = k==0 ? .05 : .035;
       motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
     }
   }
-  col += vec3(1., .5, .55) * motes * (.06 + .2*light);
+  col += vec3(1., .55, .62) * motes * (.03 + .18*light);
 
-  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= 1. - .42*smoothstep(.35, 1.2, ev);        // 边缘压暗 → 纵深
+
+  // 最后统一做保色相溢出：B 不被截断，光心泛向淡长春花白，不往青色走
+  float mx = max(col.b, max(col.g, col.r));
+  // 柔和压缩：亮度越高增长越慢但不截平 → 光斑内部从边缘到光心一直有渐变（不额外泛白 → 不浑）
+  vec3 hue = col / max(mx, 1e-4);
+  col = hue * (1. - exp(-mx * 1.6)) * 1.05;
+  col += vec3(1., .32, .5) * max(mx - 1., 0.) * .3;
+  // 能量源：只有很小的光心是热亮的（不整片泛白 → 不浑）
+  col = mix(col, vec3(1., .5, .64), pow(glowC, 4.) * (.5 + .1*breath));
+
   col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
   o = vec4(min(col, 1.), 1.);
 }
@@ -321,7 +317,7 @@ precision highp float;
 uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
 out vec4 o;
 
-float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float n(vec2 p){
   vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
   return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
@@ -344,14 +340,14 @@ void main(){
   // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
   vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
   vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
-  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  vec2 dv = uv - lp + wv*0.378 + wv2*0.126;   // 光斑 = 定稿的 90%
   float ang0 = atan(dv.y, dv.x);
   float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
   float r1 = length(dv * vec2(1., .8)) * lobes;
-  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
-  float glow  = exp(-r1*r1*3.);                  // 大面积柔光
-  float glowC = exp(-r1*r1*7.);                  // 光心
-  float glow2 = exp(-r2*r2*3.2) * .3;
+  float r2 = length((uv - lp2 + wv*0.450) * vec2(1., .8));
+  float glow  = exp(-r1*r1*3.7);                  // 大面积柔光
+  float glowC = exp(-r1*r1*8.64);                  // 光心
+  float glow2 = exp(-r2*r2*3.95) * .3;
   float light = glow + glow2;
 
   // —— 宝石内部 ——
@@ -362,7 +358,7 @@ void main(){
   vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
   vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
   float garden = fbm(gp + 2.6*w);
-  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
   // 内部折射的柔和光纹（被光照到才显现）
   vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
   float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
@@ -388,12 +384,12 @@ void main(){
   col += vec3(0., .08, .5) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
-  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
   col += vec3(.05, .13, .38) * sh;
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.03, .2, .75) * exp(-rm*rm*6.) * .3;
+  col += vec3(.03, .2, .75) * exp(-rm*rm*7.41) * .3;
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
@@ -431,7 +427,7 @@ precision highp float;
 uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK; 
 out vec4 o;
 
-float h1(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float n(vec2 p){
   vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
   return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
@@ -454,14 +450,14 @@ void main(){
   // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
   vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
   vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
-  vec2 dv = uv - lp + wv*.42 + wv2*.14;
+  vec2 dv = uv - lp + wv*0.378 + wv2*0.126;   // 光斑 = 定稿的 90%
   float ang0 = atan(dv.y, dv.x);
   float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
   float r1 = length(dv * vec2(1., .8)) * lobes;
-  float r2 = length((uv - lp2 + wv*.5) * vec2(1., .8));
-  float glow  = exp(-r1*r1*4.8);                  // 大面积柔光（紫色收小：蓝光几乎不被吸收，外围显得更大）
-  float glowC = exp(-r1*r1*10.);                  // 光心
-  float glow2 = exp(-r2*r2*4.6) * .26;   // 第二光斑也收小
+  float r2 = length((uv - lp2 + wv*0.450) * vec2(1., .8));
+  float glow  = exp(-r1*r1*5.93);                  // 大面积柔光（紫色收小：蓝光几乎不被吸收，外围显得更大）
+  float glowC = exp(-r1*r1*12.3);                  // 光心
+  float glow2 = exp(-r2*r2*5.68) * .26;   // 第二光斑也收小
   float light = glow + glow2;
 
   // —— 宝石内部 ——
@@ -472,7 +468,7 @@ void main(){
   vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
   vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
   float garden = fbm(gp + 2.6*w);
-  float veins  = smoothstep(.07, 0., abs(garden - .52));
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
   // 内部折射的柔和光纹（被光照到才显现）
   vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
   float caus = pow(1. - abs(fbm(cp + fbm(cp*.7 - t*.04)*1.5)*2. - 1.), 6.);
@@ -502,12 +498,12 @@ void main(){
   col += vec3(.22, .0, .3) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
-  float sh = exp(-pow(dot(uv + lp*.35, normalize(vec2(1., .5))) * 3., 2.));
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
   col += vec3(.2, .06, .34) * sh;
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.52, .02, .68) * exp(-rm*rm*8.5) * .22;   // 对侧反射光也收小
+  col += vec3(.52, .02, .68) * exp(-rm*rm*10.5) * .22;   // 对侧反射光也收小
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
