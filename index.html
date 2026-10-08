@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Gemflow: Crystal Energy</title>
-<meta name="description" content="Your phone, a living crystal. Four gemstones that breathe, glow and flow with you. Coming soon to Android.">
+<meta name="description" content="Your phone, a living crystal. Living gemstones that breathe, glow and flow with you. Coming soon to Android.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -75,6 +75,7 @@
 <main class="hero">
   <div class="lines" id="lines">
     <div class="line on"><p class="name">Emerald</p><h2>Your phone, a <em>living</em> crystal.</h2></div>
+    <div class="line"><p class="name">Citrine</p><h2>Let your inner <em>sun</em> rise.</h2></div>
     <div class="line"><p class="name">Ruby</p><h2>It <em>breathes</em>, glows and flows with you.</h2></div>
     <div class="line"><p class="name">Sapphire</p><h2>On your <em>call screen</em>. On your lock screen.</h2></div>
     <div class="line"><p class="name">Amethyst</p><h2>Feel the energy <em>within</em> — the stone’s, and your own.</h2></div>
@@ -105,8 +106,18 @@ float n(vec2 p){
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); vec3 q;
+  #define JH(c) jhash(c)
+  return mix(mix(JH(i),JH(i+vec2(1,0)),f.x), mix(JH(i+vec2(0,1)),JH(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
@@ -149,12 +160,10 @@ void main(){
   float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
 
   // 暗处：深邃的祖母绿，仍保留纹理
-  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  float L = .06;                                   // 清澈 C1：去掉云雾纹理/包体
   // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
   L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
-  L += light * (garden - .45) * .07;
   L += light * caus * .16 + light * caus2 * .07;  // 通透处理：光路。此三颗原折射纹权重只有红宝石/黄水晶的约 1/5（.06 vs .28），按比例换算到同样的视觉强度（.45 直接用会发白成闪电）
-  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
   L += glowC * .32;
   L = max(L, .03);
   L = pow(L, 1.8) * .85;                        // 压深暗部、保留光心 → 深沉又通透
@@ -166,20 +175,20 @@ void main(){
   col += vec3(.62, 1., .45) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
   col.r += max(L - 1., 0.) * .32; col.b += max(L - 1., 0.) * .05;
   // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
-  col += vec3(0., .26, .17) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  col += vec3(0., .26, .17) * (1. - smoothstep(0., .7, light)) * .9;
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
   float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
-  col += vec3(.03, .2, .13) * sh;
+  // 清澈 C2：去掉表面柔光纱
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(0., .42, .26) * exp(-rm*rm*12.24) * .3;
+  // 清澈 C2：去掉倒影光团
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(0., .38, .24) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+  // 清澈 C2：去掉边缘柔光
 
   // 上升的生命光点：靠近光的地方更亮
   float motes = 0.;
@@ -203,6 +212,134 @@ void main(){
   col += vec3(.6, 1., .5) * motes * (.06 + .2*light);
 
   col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  vec3 jN = normalize(vec3(-jg*2.2, 1.));
+  float jd1 = dot(jN, normalize(vec3(-.35, .55, 1.))), jd2 = dot(jN, normalize(vec3(.4, -.3, 1.)));
+  float jspec = smoothstep(.9965, .9992, jd1) + pow(max(jd1, 0.), 120.) * .12;           // 边缘利落的小高光 + 极淡的晕
+  float jspec2 = (smoothstep(.998, .9995, jd2) + pow(max(jd2, 0.), 200.) * .08) * .6;
+  col += vec3(.9, 1., .95) * (jspec + jspec2) * 0.;
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-citrine" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform vec2 P; uniform float PK;
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// 黄水晶 · 定稿（2026-10-07 用户选 K2）：G 的黄色 + 隐约的锐利光路两层（有纵深）
+// 来源：黄水晶_试验/黄水晶_K2.html
+// 前身 K（2026-10-07 夜，用户：J 太模糊、比第一版还差，往反方向 → 回到 G 的颜色和深度，加锐利的光路）
+//   依据：宝石显得通透/有生气靠“亮区与暗区的反差”+ 清晰的内部光路（焦散）；柔和低反差的光团 = 半透明（果冻/牛奶）
+// 前身 G（2026-10-07，用户：B–F 变成金色了，要回到最开始 A 的黄色 → 颜色全部用 A 的，保留 D–F 的利落光晕、反差、光心不发白）
+// 前身 F（2026-10-07，用户：E 背景太暗，光心不错 → 只提亮没被光照到的底色、四周少压暗；光晕宽度和光心不动 → 不会重新变糊）
+// 前身 E（2026-10-07，D 暗处偏橄榄土色、光心一大块发白 → 暗处饱和蜜琥珀、反差曲线 1.5、光心少加白）
+// 前身 D（2026-10-07，用户：黄的有点模糊 → 大光晕在黄色上变成一层雾。借绿宝石“深沉”配方：亮度反差曲线 pow 1.7、光晕收窄、四周压暗加重；光心不动）
+// 前身 C（2026-10-07，用户：B 整体不错但不通透 → 只把暗处压深：厚处多吸收红/绿，暗部底色降低；光与光心不动）
+// 前身 B（2026-10-07，A 太平、暗处芥末/橄榄、光心柠檬黄 → 厚处琥珀金、光心香槟、边缘压暗回到红宝石水平）：光形、运动与红宝石完全相同，只换颜色
+// 规则：通透；厚处深金黄、薄处香槟金；暗处不压黑（深黄压暗会发棕）；不往绿黄（荧光）或橙色走
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  float t = T;
+
+  float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
+
+  // —— 光源路径与定稿相同 ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：只留很轻的低频扭曲（原来 .42+.14 的扭曲让光的轮廓本身变成了云/烟）
+  vec2 wv = vec2(fbm(uv*1.1 + vec2(t*.05, -t*.04)), fbm(uv*1.1 + vec2(7.3, 2.1) + vec2(-t*.04, t*.06))) - .5;
+  vec2 dv = uv - lp + wv*.11;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .14*sin(ang0*2. + t*.23) + .08*sin(ang0*3. - t*.31 + 1.7);
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.14) * vec2(1., .8));
+  float glow  = exp(-r1*r1*12.);                 // D：光晕收窄（红宝石 8.6）→ 边缘利落，不糊
+  float glowC = exp(-r1*r1*22.4);
+  float glow2 = exp(-r2*r2*12.) * .22;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 折射光纹：结构与运动和定稿完全一样，只在光里显现
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);               // K：光路变细变锐（G 是 6 次方 → 一片软纹）
+  // 第二层更深处的光路：更大、更慢、视差更大 → 看进宝石的体积里
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
+  float L = .05 + .06*(deep - .5);
+  L += light * (.72 + .1*breath);                 // K：整团光的底亮略降，把亮度让给光路（反差）
+  L += light * caus * .45 + light * caus2 * .2;   // K：光路是光里最亮、最清楚的部分
+  L += glowC * .3;                                // E：光心少加亮（D 发白成片）
+  L = max(L, 0.);
+  L = pow(L, 1.5) * 1.05;                         // D：反差曲线（同绿宝石定稿的“深沉”做法）→ 暗处更深、亮处保持
+
+  // Beer–Lambert：蓝几乎全吸收，绿只比红多吸收一点 → 厚处深金黄（G/R≈.75，色相约 45°），薄处近乎香槟白
+  float thick = mix(2.6, .5, smoothstep(0., 1.3, L));
+  vec3 absorb = vec3(.08, .19, 2.4);   // G：回到 A 的黄色   // E：厚处 G/R≈.53 蜜琥珀（比 D 暖一点，去掉橄榄味）   // C：厚处 R≈.40 G≈.24（G/R≈.6 蜜金，不到棕）；薄处仍近香槟   // 厚处 G/R≈.62（琥珀金）；薄处 G/R≈.91、蓝透得多 → 淡香槟，不是柠檬
+  vec3 col = (L*.95 + .03) * exp(-absorb*thick);
+  col += vec3(1., .95, .8) * pow(glowC, 5.) * .25;   // 极小的透亮点
+  // 光没照到的地方：饱和的金黄底色，提亮一点、不发黑不发棕
+  col += vec3(.2, .13, .0) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+
+  // 抛光表面：一抹很淡的反光，随光反向移动
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
+  col += vec3(.16, .12, .03) * exp(-shd*shd);
+
+  // 内部反射：对侧一团淡淡的倒影光
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  col += vec3(.6, .44, .04) * exp(-rm*rm*16.3) * .24;
+
+  // 边缘内反射：边缘聚光 → 晶体体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  col += vec3(.55, .38, .03) * smoothstep(.5, 1.15, ev) * rimSide * .3;
+
+  // 光点：数量减少，只在光附近明显
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .3) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .05 : .035;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(1., .9, .65) * motes * (.03 + .18*light);
+
+  col *= 1. - .45*smoothstep(.35, 1.2, ev);        // 边缘压暗 → 纵深（F：比 E 轻）
+
+  // 最后统一做保色相溢出：光心泛向暖香槟白，不往绿黄（荧光）走
+  float mx = max(col.b, max(col.g, col.r));
+  // 柔和压缩：亮度越高增长越慢但不截平 → 光斑内部从边缘到光心一直有渐变（不额外泛白 → 不浑）
+  vec3 hue = col / max(mx, 1e-4);
+  col = hue * (1. - exp(-mx * 1.6)) * 1.05;
+  col += vec3(1., .92, .55) * max(mx - 1., 0.) * .2;
+  // 能量源：只有很小的光心是热亮的（不整片泛白 → 不浑）
+  col = mix(col, vec3(1., .93, .66), pow(glowC, 4.) * (.32 + .08*breath));   // E：光心淡金、不发白
+
   col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
   o = vec4(min(col, 1.), 1.);
 }
@@ -564,6 +701,7 @@ const WAITLIST_URL = 'https://script.google.com/macros/s/AKfycbwsvbduKEv9VG7ixrf
 
 const GEMS = [
   { id: 'emerald',  c: '#2fe39a' },
+  { id: 'citrine',  c: '#f2c21b' },
   { id: 'ruby',     c: '#ff2f5a' },
   { id: 'sapphire', c: '#4a7dff' },
   { id: 'amethyst', c: '#b46dff' },
