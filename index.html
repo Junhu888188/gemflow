@@ -91,7 +91,7 @@
     </form>
     <p class="note" id="note">One email at launch. No spam. <a href="/privacy.html">Privacy</a></p>
   </div>
-  <p class="foot">© 2026 Gemflow · <a href="mailto:hello@gemflowcrystal.com">hello@gemflowcrystal.com</a> · <a href="/privacy.html">Privacy</a></p>
+  <p class="foot">© 2026 Gemflow · <a href="mailto:hello@gemflowcrystal.com">hello@gemflowcrystal.com</a> · <a href="https://www.youtube.com/@gemflowcrystal" target="_blank" rel="noopener">YouTube</a> · <a href="/privacy.html">Privacy</a></p>
 </main>
 
 <script id="fs-emerald" type="x-shader/x-fragment">#version 300 es
@@ -233,6 +233,13 @@ float n(vec2 p){
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
 // 黄水晶 · 定稿（2026-10-07 用户选 K2）：G 的黄色 + 隐约的锐利光路两层（有纵深）
 // 来源：黄水晶_试验/黄水晶_K2.html
 // 前身 K（2026-10-07 夜，用户：J 太模糊、比第一版还差，往反方向 → 回到 G 的颜色和深度，加锐利的光路）
@@ -246,6 +253,8 @@ float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3
 // 规则：通透；厚处深金黄、薄处香槟金；暗处不压黑（深黄压暗会发棕）；不往绿黄（荧光）或橙色走
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
@@ -280,7 +289,7 @@ void main(){
   float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
 
   // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
-  float L = .05 + .06*(deep - .5);
+  float L = .05;                                   // 清澈：去掉云雾纹理/包体
   L += light * (.72 + .1*breath);                 // K：整团光的底亮略降，把亮度让给光路（反差）
   L += light * caus * .45 + light * caus2 * .2;   // K：光路是光里最亮、最清楚的部分
   L += glowC * .3;                                // E：光心少加亮（D 发白成片）
@@ -293,20 +302,20 @@ void main(){
   vec3 col = (L*.95 + .03) * exp(-absorb*thick);
   col += vec3(1., .95, .8) * pow(glowC, 5.) * .25;   // 极小的透亮点
   // 光没照到的地方：饱和的金黄底色，提亮一点、不发黑不发棕
-  col += vec3(.2, .13, .0) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  col += vec3(.2, .13, .0) * (1. - smoothstep(0., .7, light)) * .9;
 
   // 抛光表面：一抹很淡的反光，随光反向移动
   float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
-  col += vec3(.16, .12, .03) * exp(-shd*shd);
+  // 清澈：去掉表面柔光纱
 
   // 内部反射：对侧一团淡淡的倒影光
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.6, .44, .04) * exp(-rm*rm*16.3) * .24;
+  // 清澈：去掉倒影光团
 
   // 边缘内反射：边缘聚光 → 晶体体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(.55, .38, .03) * smoothstep(.5, 1.15, ev) * rimSide * .3;
+  // 清澈：去掉边缘柔光
 
   // 光点：数量减少，只在光附近明显
   float motes = 0.;
@@ -356,9 +365,18 @@ float n(vec2 p){
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
 // 红宝石 · 通透版（试验，由蓝宝石通透 B 换色）：光形干净、亮区不叠烟雾纹理、Beer–Lambert 上色
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
@@ -393,7 +411,7 @@ void main(){
   float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
 
   // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
-  float L = .05 + .06*(deep - .5);
+  float L = .05;                                   // 清澈：去掉云雾纹理/包体
   L += light * (0.72 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
   L += light * caus * .65 + light * caus2 * .3;   // 通透2（用户：红色再通透一点）：光路 +45%
   L += glowC * .46;
@@ -406,20 +424,20 @@ void main(){
   vec3 col = (L*.9 + .02) * exp(-absorb*thick);
   col += vec3(1., .6, .7) * pow(glowC, 5.) * .25;   // 极小的透亮点
   // 光没照到的地方：饱和的蓝宝石底色，不发黑
-  col += vec3(.17, 0., .03) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  col += vec3(.17, 0., .03) * (1. - smoothstep(0., .7, light)) * .9;
 
   // 抛光表面：一抹很淡的反光，随光反向移动
   float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
-  col += vec3(.18, .02, .05) * exp(-shd*shd);
+  // 清澈：去掉表面柔光纱
 
   // 内部反射：对侧一团淡淡的倒影光
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.6, .01, .1) * exp(-rm*rm*16.3) * .24;
+  // 清澈：去掉倒影光团
 
   // 边缘内反射：边缘聚光 → 晶体体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(.55, .01, .09) * smoothstep(.5, 1.15, ev) * rimSide * .3;
+  // 清澈：去掉边缘柔光
 
   // 光点：数量减少，只在光附近明显
   float motes = 0.;
@@ -469,8 +487,17 @@ float n(vec2 p){
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
@@ -513,12 +540,10 @@ void main(){
   float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
 
   // 暗处：深邃的祖母绿，仍保留纹理
-  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  float L = .06;                                   // 清澈：去掉云雾纹理/包体
   // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
   L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
-  L += light * (garden - .45) * .07;
   L += light * caus * .16 + light * caus2 * .07;  // 通透处理：光路。此三颗原折射纹权重只有红宝石/黄水晶的约 1/5（.06 vs .28），按比例换算到同样的视觉强度（.45 直接用会发白成闪电）
-  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
   L += glowC * .32;
   L = max(L, .03);
   L = pow(L, 1.8) * 1.2;                        // 压深暗部、保留光心 → 深沉又通透
@@ -530,20 +555,20 @@ void main(){
   col += vec3(.72, .8, 1.) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
   col.r += max(L - 1., 0.) * .38; col.g += max(L - 1., 0.) * .3;
   // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
-  col += vec3(0., .08, .5) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  col += vec3(0., .08, .5) * (1. - smoothstep(0., .7, light)) * .9;
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
   float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
-  col += vec3(.05, .13, .38) * sh;
+  // 清澈：去掉表面柔光纱
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.03, .2, .75) * exp(-rm*rm*7.41) * .3;
+  // 清澈：去掉倒影光团
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(.03, .18, .7) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+  // 清澈：去掉边缘柔光
 
   // 上升的生命光点：靠近光的地方更亮
   float motes = 0.;
@@ -583,8 +608,17 @@ float n(vec2 p){
 }
 float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
 
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
 void main(){
   vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
   float t = T;
 
   float breath = .5 + .5*sin(t*1.4);              // 呼吸节律
@@ -627,13 +661,11 @@ void main(){
   float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
 
   // 暗处：深邃的祖母绿，仍保留纹理
-  float L = .06 + .1*(deep-.5) + .04*(garden-.5);
+  float L = .06;                                   // 清澈：去掉云雾纹理/包体
   // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
   L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
   float clearZ = smoothstep(.3, .9, light);                     // 玻璃感：受光区清澈，不带云雾
-  L += light * (garden - .45) * .07;
   L += light * caus * .24 + light * caus2 * .1;   // 通透2（用户：紫色再通透一点）：光路 +50%
-  L += veins * (.02 + .08*light) * (.7 + .3*breath);   // 生命脉络：随呼吸微微发亮
   L += glowC * .32;
   L = max(L, .03);
   L = pow(L, 1.8) * 1.25;                        // 压深暗部、保留光心 → 深沉又通透
@@ -648,20 +680,20 @@ void main(){
   col += vec3(.78, .64, 1.) * glowC * glowC * (.2 + .06*breath);   // 带紫的白   // 光心透出暖白
   col.g += max(L - 1., 0.) * .2; col.r += max(L - 1., 0.) * .1;   // 红绿一起溢出，保持紫色平衡
   // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
-  col += vec3(.22, .0, .3) * (1. - smoothstep(0., .7, light)) * (.9 + .12*(deep-.5));
+  col += vec3(.22, .0, .3) * (1. - smoothstep(0., .7, light)) * .9;
 
   // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
   float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
-  col += vec3(.2, .06, .34) * sh;
+  // 清澈：去掉表面柔光纱
 
   // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
   float rm = length((uv + lp*.85) * vec2(1., .8));
-  col += vec3(.52, .02, .68) * exp(-rm*rm*10.5) * .22;   // 对侧反射光也收小
+  // 清澈：去掉倒影光团
 
   // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
   float ev = length(uv*vec2(1.1,.8));
   float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
-  col += vec3(.48, .02, .62) * smoothstep(.5, 1.15, ev) * rimSide * .35;
+  // 清澈：去掉边缘柔光
 
   // 上升的生命光点：靠近光的地方更亮
   float motes = 0.;
