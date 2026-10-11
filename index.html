@@ -3,15 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Gemflow: Crystal Energy</title>
-<meta name="description" content="Your phone, a living crystal. Living gemstones that breathe, glow and flow with you. Coming soon to Android.">
+<title>Gemflow: Crystal Energy — Living Gemstone Live Wallpaper for Android</title>
+<meta name="description" content="Gemflow turns your phone into a living crystal: a real-time gemstone live wallpaper, a glowing incoming-call screen, light you guide with your finger, and breathing with the stone. Emerald, citrine, ruby, sapphire and amethyst. Coming soon to Android.">
+<link rel="canonical" href="https://gemflowcrystal.com/">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gemflowcrystal.com/">
+<meta property="og:site_name" content="Gemflow">
 <meta property="og:image" content="https://gemflowcrystal.com/icon-512.png">
 <meta property="og:title" content="Gemflow: Crystal Energy">
-<meta property="og:description" content="Your phone, a living crystal. Join the waitlist.">
+<meta property="og:description" content="Your phone, a living crystal — a gemstone live wallpaper and call screen that breathes, glows and flows with you.">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"Organization","@id":"https://gemflowcrystal.com/#org","name":"Gemflow","url":"https://gemflowcrystal.com/","logo":"https://gemflowcrystal.com/icon-512.png","email":"hello@gemflowcrystal.com","sameAs":["https://www.youtube.com/@gemflowcrystal"]},
+ {"@type":"SoftwareApplication","name":"Gemflow: Crystal Energy","operatingSystem":"Android","applicationCategory":"LifestyleApplication","url":"https://gemflowcrystal.com/","publisher":{"@id":"https://gemflowcrystal.com/#org"},"description":"A living gemstone live wallpaper and incoming-call screen. Real-time crystal light you can touch and breathe with: emerald, citrine, ruby, sapphire and amethyst.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
+ {"@type":"WebSite","name":"Gemflow","url":"https://gemflowcrystal.com/","publisher":{"@id":"https://gemflowcrystal.com/#org"}}
+]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -53,6 +65,7 @@
   form button { font: inherit; font-size: 15px; font-weight: 500; color: #04140d; background: #fff; border: 0; border-radius: 999px; padding: 13px 22px; cursor: pointer; white-space: nowrap; transition: box-shadow .4s; }
   form button:hover { box-shadow: 0 0 24px var(--accent); }
   .hp { position: absolute; left: -9999px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .note { font-size: 12px; color: rgba(255,255,255,.55); margin: 12px 0 0; min-height: 1.4em; }
   .note.ok { color: #fff; font-size: 14px; }
   .foot { font-size: 11px; color: rgba(255,255,255,.4); margin: 22px 0 0; }
@@ -69,7 +82,7 @@
 <body>
 <canvas id="c"></canvas>
 <div class="scrim"></div>
-<p class="brand">GEMFLOW</p>
+<h1 class="brand">GEMFLOW<span class="sr"> — living crystal live wallpaper and call screen for Android</span></h1>
 <ul class="dots" id="dots"></ul>
 
 <main class="hero">
