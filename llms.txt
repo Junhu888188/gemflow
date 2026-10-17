@@ -1,6 +1,6 @@
 # Gemflow
 
-> Gemflow: Crystal Energy is an Android app that turns your phone into a living crystal: a real-time gemstone live wallpaper, a glowing incoming-call screen, light you guide with your finger, and a breathing companion that pulses with the stone. Coming soon to Android; iOS later.
+> Gemflow: Crystal Energy is an Android app that turns your phone into a living crystal: a real-time gemstone live wallpaper, a glowing incoming-call screen, light you guide with your finger, and a breathing companion that pulses with the stone. Coming soon to Android; an iPhone version is in development.
 
 Gemflow is made by an independent developer in Australia. It is for relaxation, meditation and ritual — not a medical product.
 
@@ -13,6 +13,10 @@ Each stone has its own living light and a matching one-hour meditation track (gu
 - Emerald — heart chakra color — 639 Hz: https://youtu.be/Ntq4LeBtSCY · page: https://gemflowcrystal.com/emerald/
 - Sapphire — throat chakra color — 741 Hz: https://youtu.be/M5VmHUEpwcw · page: https://gemflowcrystal.com/sapphire/
 - Amethyst — crown chakra color — 963 Hz: https://youtu.be/KeWATSzXJTw · page: https://gemflowcrystal.com/amethyst/
+
+## Guide
+
+- Chakra stones and frequencies chart (which stone, chakra and frequency go together, with FAQ): https://gemflowcrystal.com/chakra-stones/
 
 ## Links
 
