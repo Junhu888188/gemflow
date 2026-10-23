@@ -1,6 +1,6 @@
 # Gemflow
 
-> Gemflow: Crystal Energy is an Android app that turns your phone into a living crystal: a real-time gemstone live wallpaper, a glowing incoming-call screen, light you guide with your finger, and a breathing companion that pulses with the stone. Coming soon to Android; an iPhone version is in development.
+> Gemflow: Crystal Energy is a phone app that turns your phone into a living crystal: real-time gemstone light you guide with your finger, and a one-minute meditation with your stone (called Meditate in the app). On Android it is also a live wallpaper and a glowing incoming-call screen; on iPhone it saves a Live Photo for your Lock Screen. Android coming soon; iPhone coming soon to the App Store.
 
 Gemflow is made by an independent developer in Australia. It is for relaxation, meditation and ritual — not a medical product.
 
@@ -23,5 +23,6 @@ Each stone has its own living light and a matching one-hour meditation track (gu
 
 - Website and waitlist: https://gemflowcrystal.com/
 - YouTube: https://www.youtube.com/@gemflowcrystal
+- Support: https://gemflowcrystal.com/support/
 - Privacy policy: https://gemflowcrystal.com/privacy.html
 - Contact: hello@gemflowcrystal.com
