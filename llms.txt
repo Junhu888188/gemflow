@@ -1,38 +1,65 @@
 # Gemflow
 
-> Gemflow: Crystal Energy is a phone app that turns your phone into a living crystal: real-time gemstone light you guide with your finger, and a one-minute meditation with your stone (called Meditate in the app). On Android it is also a live wallpaper and a glowing incoming-call screen; on iPhone it saves a Live Photo for your Lock Screen. Android coming soon; iPhone coming soon to the App Store.
+> Gemflow: Crystal Energy is a meditation app for iPhone and Android. It shows five living gemstones (ruby, citrine, emerald, sapphire, amethyst) as real-time light on your phone. You breathe with the light in a guided meditation of 1 to 20 minutes, with recorded music and one Solfeggio frequency tone per stone (396, 528, 639, 741, 963 Hz). Coming soon to the App Store and Google Play.
 
-Gemflow is made by an independent developer in Australia. It is for relaxation, meditation and ritual — not a medical product.
+Gemflow is made by an independent developer in Australia. It is for relaxation, meditation, mindful breathing and ritual. It is not a medical product and does not diagnose, treat or cure anything; the site says plainly where research on frequencies and crystals is thin.
 
-## Stones and frequencies
+## The app
 
-Each stone has its own living light and a matching one-hour meditation track (guqin we recorded ourselves, real singing bowls, ocean waves and one pure frequency tone):
+- What it is: a phone app in which each stone is drawn live on the phone (a real-time shader, not a looped video). The light follows your finger.
+- Meditate: breathe slowly as the stone's light swells and settles with you. Choose 1, 3, 5, 10 or 20 minutes. Follow the guided rhythm, or hold to breathe in and release to breathe out, and the light learns your own pace ("My rhythm").
+- Sound: guqin we recorded ourselves, real singing bowls and ocean waves. Beneath them, the stone's own frequency tone, mixed very softly (about 40 dB below the music), so it is barely audible. One button turns all sound off.
+- iPhone: save your stone as a Live Photo for your Lock Screen.
+- Android: set your stone as a live wallpaper, and optionally let it glow full-screen on incoming calls (Android 10 or newer). Gemflow never blocks, records or rejects calls.
+- Price: free to download. The first time you open it, one stone chooses you and is yours to keep, free. Other stones are one-time purchases, or all five together. No subscription, no ads.
+- Privacy: no account, no ads, no analytics. Works offline. Everything stays on the phone.
+- Availability: iPhone (App Store) and Android (Google Play), both coming soon.
 
-- Ruby — root chakra color — 396 Hz: https://youtu.be/5sbERpbVyoM · page: https://gemflowcrystal.com/ruby/
-- Citrine — solar plexus chakra color — 528 Hz: https://youtu.be/2jQwbFc6lPQ · page: https://gemflowcrystal.com/citrine/
-- Emerald — heart chakra color — 639 Hz: https://youtu.be/Ntq4LeBtSCY · page: https://gemflowcrystal.com/emerald/
-- Sapphire — throat chakra color — 741 Hz: https://youtu.be/M5VmHUEpwcw · page: https://gemflowcrystal.com/sapphire/
-- Amethyst — crown chakra color — 963 Hz: https://youtu.be/KeWATSzXJTw · page: https://gemflowcrystal.com/amethyst/
+## Stones, chakras and frequencies in the app
 
-## Guide
+Each stone pairs with one chakra color and one Solfeggio tone. The pairings follow common modern meditation practice, not scientific research. Each stone also has a one-hour meditation track on YouTube.
 
-- Chakra stones and frequencies chart (which stone, chakra and frequency go together, with FAQ): https://gemflowcrystal.com/chakra-stones/
-- Which stone goes with each chakra color (ruby, citrine, emerald, sapphire, amethyst, with sourced history): https://gemflowcrystal.com/chakra-colors/
-- Which stone belongs to the heart chakra (red in the 1577 Sanskrit text, gold in Leadbeater 1927, green and pink today, with sources): https://gemflowcrystal.com/heart-chakra-stone/
+- [Ruby](https://gemflowcrystal.com/ruby/): the grounding stone. Root chakra, red, 396 Hz (about the tone: https://gemflowcrystal.com/396-hz/). Video: https://youtu.be/5sbERpbVyoM
+- [Citrine](https://gemflowcrystal.com/citrine/): the warm golden stone. Solar plexus chakra, yellow, 528 Hz (about the tone: https://gemflowcrystal.com/528-hz/). Video: https://youtu.be/2jQwbFc6lPQ
+- [Emerald](https://gemflowcrystal.com/emerald/): the green stone. Heart chakra, green, 639 Hz (about the tone: https://gemflowcrystal.com/639-hz/). Video: https://youtu.be/Ntq4LeBtSCY
+- [Sapphire](https://gemflowcrystal.com/sapphire/): the blue stone. Throat chakra, blue, 741 Hz (about the tone: https://gemflowcrystal.com/741-hz/). Video: https://youtu.be/M5VmHUEpwcw
+- [Amethyst](https://gemflowcrystal.com/amethyst/): the violet stone. Crown chakra, violet, 963 Hz (about the tone: https://gemflowcrystal.com/963-hz/). Video: https://youtu.be/KeWATSzXJTw
+
+## Guides
+
+- [Chakra stones and frequencies chart](https://gemflowcrystal.com/chakra-stones/): which stone, chakra and frequency go together (ruby–root–396 Hz to amethyst–crown–963 Hz), with a one-hour track for each and an FAQ.
+- [Which stone goes with each chakra color?](https://gemflowcrystal.com/chakra-colors/): red ruby, yellow citrine, green emerald, blue sapphire, violet amethyst, with the sourced history of each stone's name and lore.
+- [Which stone belongs to the heart chakra?](https://gemflowcrystal.com/heart-chakra-stone/): red in the 1577 Sanskrit text Ṣaṭ-Cakra-Nirūpaṇa, gold in Leadbeater (1927), green and pink in modern guides, with sources.
+- [The root chakra: the red light that brings you home](https://gemflowcrystal.com/root-chakra-stone/): grounding, safety and life force; why the root lotus has been red from the 1577 Sanskrit text (crimson petals around a yellow square of Earth) through Leadbeater 1927 to today; a simple grounding ritual; ruby and 396 Hz in the Gemflow app; sources at the end.
 
 ## Frequencies
 
-- Solfeggio frequencies, all nine (174–963 Hz): chart with syllables, popular labels, chakra pairings and the Gemflow stone for each, real history, research and safety: https://gemflowcrystal.com/solfeggio-frequencies/
-- 528 Hz: what it is, where the Solfeggio frequencies came from (Horowitz 1999), the one small 2018 study, safety, and citrine as the 528 Hz stone in the Gemflow app: https://gemflowcrystal.com/528-hz/
-- 396 Hz, the root chakra frequency: where the number came from (Horowitz 1999), the “liberating guilt and fear” label, the missing research, safety, and ruby as the 396 Hz stone in the Gemflow app: https://gemflowcrystal.com/396-hz/
-- 639 Hz, the heart chakra frequency: where the number came from (Horowitz 1999), the “connecting / relationships” label, the missing research, safety, and emerald as the 639 Hz stone in the Gemflow app: https://gemflowcrystal.com/639-hz/
-- 741 Hz, the throat chakra frequency: where the number came from (Horowitz 1999), its disputed labels, the unsupported detox claims, the missing research, safety, and sapphire as the 741 Hz stone in the Gemflow app: https://gemflowcrystal.com/741-hz/
-- 963 Hz, the “God frequency”: what it is, why it was not in the original 1999 Solfeggio list, the missing research, safety, and amethyst as the 963 Hz stone in the Gemflow app: https://gemflowcrystal.com/963-hz/
+- [Solfeggio frequencies explained](https://gemflowcrystal.com/solfeggio-frequencies/): all nine tones (174–963 Hz) in one chart with their syllables, popular labels, chakra pairings and the Gemflow stone for each; where the list really came from, what the research says, and safe volume.
+- [528 Hz](https://gemflowcrystal.com/528-hz/): the "love frequency", the "Mi" of the Solfeggio tones (Horowitz 1999), traditionally linked to transformation; paired with the solar plexus chakra and citrine; a simple 528 Hz meditation; FAQ on the note (close to C5), the one small 2018 study, DNA claims and safety.
+- [432 Hz or 528 Hz: which one is calling you?](https://gemflowcrystal.com/432-hz-vs-528-hz/): 432 Hz is a proposed tuning for the note A (instead of the 440 Hz standard, ISO 16), 528 Hz is a single Solfeggio tone (Horowitz 1999); how they differ, how people choose between them for meditation, history of concert pitch, FAQ and sources.
+- [396 Hz](https://gemflowcrystal.com/396-hz/): the root chakra frequency, lowest of the original six Solfeggio tones, traditionally labelled "liberating guilt and fear"; paired with ruby; a simple grounding meditation; FAQ on the note (close to G4), research and safety.
+- [639 Hz](https://gemflowcrystal.com/639-hz/): the heart chakra frequency, traditionally labelled "connecting / relationships"; paired with emerald; a simple heart-opening meditation; FAQ on the note (between E♭5 and E5), research and safety.
+- [741 Hz](https://gemflowcrystal.com/741-hz/): the throat chakra frequency, traditionally labelled "expression and solutions" or "awakening intuition"; paired with sapphire; a simple meditation for clarity; FAQ on the note (F♯5), detox claims and safety.
+- [963 Hz](https://gemflowcrystal.com/963-hz/): the "God frequency", highest Solfeggio tone, added to the list after the original six; paired with the crown chakra and amethyst; a simple meditation for connection; FAQ on the name, history, research and safety.
+
+## Quick facts
+
+- What is Gemflow? A meditation app for iPhone and Android with five living gemstones, guided breathing, recorded music and one Solfeggio tone per stone.
+- Which stone has which frequency in Gemflow? Ruby 396 Hz, citrine 528 Hz, emerald 639 Hz, sapphire 741 Hz, amethyst 963 Hz.
+- Which chakra goes with each Gemflow stone? Ruby root, citrine solar plexus, emerald heart, sapphire throat, amethyst crown.
+- Is Gemflow free? Free to download, with one stone free to keep. Other stones are one-time purchases. No subscription and no ads.
+- Is it on Android and iPhone? Both, coming soon to Google Play and the App Store.
+- Is it a video? No. The light is rendered live on the phone, never loops and responds to touch.
+- Does it need an account or internet? No account. It works offline.
+- What are the 9 Solfeggio frequencies? 174, 285, 396, 417, 528, 639, 741, 852 and 963 Hz. The original six (396–852 Hz) became known through Leonard Horowitz's 1999 book Healing Codes for the Biological Apocalypse, which credits Joseph Puleo; they are not medieval, though they borrow the names of medieval singing syllables.
+- Do Solfeggio frequencies or chakra stones heal? There is no good evidence that they do. Calm music helps many people relax; for the specific numbers there is very little research (one small 2018 study of nine adults found lower cortisol after 528 Hz music). Gemflow uses the tones as a quiet focus for meditation, not as treatment.
+- Is 432 Hz a Solfeggio frequency? No. 432 Hz is a proposed tuning for the note A instead of 440 Hz, a separate idea.
+- What are the chakra colors? In the modern Western system: red (root), orange (sacral), yellow (solar plexus), green (heart), blue (throat), indigo (third eye), violet (crown). This rainbow scheme is a 20th-century addition; older Indian texts give different colors.
 
 ## Links
 
-- Website and waitlist: https://gemflowcrystal.com/
-- YouTube: https://www.youtube.com/@gemflowcrystal
+- Website: https://gemflowcrystal.com/
+- YouTube (one-hour stone and frequency tracks, short explainers): https://www.youtube.com/@gemflowcrystal
 - Support: https://gemflowcrystal.com/support/
 - Privacy policy: https://gemflowcrystal.com/privacy.html
 - Contact: hello@gemflowcrystal.com
