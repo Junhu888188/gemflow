@@ -52,7 +52,7 @@ Each stone pairs with one chakra color and one Solfeggio tone. The pairings foll
 - Is it a video? No. The light is rendered live on the phone, never loops and responds to touch.
 - Does it need an account or internet? No account. It works offline.
 - What are the 9 Solfeggio frequencies? 174, 285, 396, 417, 528, 639, 741, 852 and 963 Hz. The original six (396–852 Hz) became known through Leonard Horowitz's 1999 book Healing Codes for the Biological Apocalypse, which credits Joseph Puleo; they are not medieval, though they borrow the names of medieval singing syllables.
-- Do Solfeggio frequencies or chakra stones heal? There is no good evidence that they do. Calm music helps many people relax; for the specific numbers there is very little research (one small 2018 study of nine adults found lower cortisol after 528 Hz music). Gemflow uses the tones as a quiet focus for meditation, not as treatment.
+- Do Solfeggio frequencies or chakra stones heal? There is no good evidence that they do. Calm music helps many people relax; for the specific numbers there is very little research (one small study of nine adults, Akimoto et al., Health, 2018, found lower cortisol after 528 Hz music). Gemflow uses the tones as a quiet focus for meditation, not as treatment.
 - Is 432 Hz a Solfeggio frequency? No. 432 Hz is a proposed tuning for the note A instead of 440 Hz, a separate idea.
 - What are the chakra colors? In the modern Western system: red (root), orange (sacral), yellow (solar plexus), green (heart), blue (throat), indigo (third eye), violet (crown). This rainbow scheme is a 20th-century addition; older Indian texts give different colors.
 
