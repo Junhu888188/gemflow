@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Free Breathing Timer — Breathe with Crystals | Gemflow</title>
+<meta name="description" content="A free visual breathing timer with five living crystals. Choose Gentle, Box, 4-7-8 or your own rhythm for a 1, 3 or 5 minute mindful break. No sign-up.">
+<link rel="canonical" href="https://gemflowcrystal.com/breathing-timer/">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gemflowcrystal.com/breathing-timer/">
+<meta property="og:site_name" content="Gemflow">
+<meta property="og:title" content="Free Breathing Timer — Breathe with Crystals | Gemflow">
+<meta property="og:description" content="Follow the light of a living crystal. A free breathing timer with Gentle, Box, 4-7-8 and custom rhythms.">
+<meta property="og:image" content="https://gemflowcrystal.com/icon-512.png">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "@id": "https://gemflowcrystal.com/breathing-timer/#app", "name": "Free Breathing Timer", "url": "https://gemflowcrystal.com/breathing-timer/", "applicationCategory": "LifestyleApplication", "operatingSystem": "Any", "browserRequirements": "Requires JavaScript; WebGL optional", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "publisher": {"@id": "https://gemflowcrystal.com/#org"}, "description": "A visual breathing timer with Gentle, Box, 4-7-8 and custom rhythms, five crystals, and one, three or five minute sessions."}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Gemflow", "item": "https://gemflowcrystal.com/"}, {"@type": "ListItem", "position": 2, "name": "Free Breathing Timer", "item": "https://gemflowcrystal.com/breathing-timer/"}]}]}</script>
+
+<style>
+:root { --accent:#2fe39a; color-scheme:dark; }
+* { box-sizing:border-box; }
+html { background:#000; }
+body { margin:0; color:#fff; background:radial-gradient(ellipse at 50% 12%,#10241e 0,transparent 48%),#000; font:400 16px/1.7 Inter,-apple-system,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:inherit; text-underline-offset:4px; }
+.brand { display:inline-block; font:400 14px Georgia,serif; letter-spacing:.42em; text-decoration:none; }
+header,footer { max-width:960px; margin:auto; padding:calc(24px + env(safe-area-inset-top)) 24px 20px; }
+nav { display:flex; justify-content:space-between; align-items:center; gap:20px; font-size:13px; }
+main { max-width:760px; margin:auto; padding:16px 24px 40px; }
+h1,h2,h3 { font-family:"Cormorant Garamond",Georgia,serif; font-weight:400; line-height:1.15; }
+h1 { font-size:clamp(38px,7vw,62px); margin:10px 0 14px; }
+h2 { font-size:30px; margin:0 0 16px; }
+h3 { font-size:23px; margin:24px 0 8px; }
+p { margin:0 0 16px; color:#d1d6d3; }
+.intro,.timer { text-align:center; }
+.kicker { font-size:11px; text-transform:uppercase; letter-spacing:.24em; color:var(--accent); margin:0; }
+.safety { font-size:14px; max-width:560px; margin:0 auto 12px; }
+.safety a { white-space:nowrap; }
+.timer { border:1px solid #ffffff26; border-radius:24px; padding:20px; background:#0008; }
+.stage { height:260px; display:grid; place-items:center; overflow:hidden; }
+.gem { width:232px; height:232px; border-radius:44% 56% 47% 53% / 55% 43% 57% 45%; overflow:hidden; background:radial-gradient(circle at 42% 38%,#fff8,var(--accent) 28%,#08140f 70%); will-change:transform,filter; }
+canvas { display:block; width:100%; height:100%; }
+.cue { min-height:78px; margin:0 0 4px; }
+#phase { display:block; color:#fff; font:400 30px/1.2 Georgia,serif; }
+#count { color:var(--accent); font-size:24px; font-variant-numeric:tabular-nums; }
+.remaining { font-size:13px; margin-bottom:18px; font-variant-numeric:tabular-nums; }
+fieldset { border:0; padding:0; margin:0 0 18px; min-width:0; }
+legend,.label { display:block; width:100%; text-align:left; font-size:13px; color:#c4cdc7; margin-bottom:8px; }
+.gems { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+button,select,input { font:inherit; }
+button,select,input[type=number] { border:1px solid #ffffff52; border-radius:12px; background:#121a16; color:#fff; min-height:44px; }
+button { padding:10px 15px; cursor:pointer; }
+button:hover:not(:disabled) { border-color:var(--accent); }
+button[aria-pressed=true] { border-color:var(--accent); background:#20382b; }
+button:disabled { opacity:.5; cursor:default; }
+:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.gems button { padding:9px 10px; font-size:13px; }
+.swatch { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; background:var(--stone); }
+.options { display:grid; grid-template-columns:2fr 1fr; gap:14px; text-align:left; }
+select { width:100%; padding:10px 8px; }
+#custom { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0; text-align:left; }
+#custom label { font-size:13px; }
+input[type=number] { width:100%; padding:8px; margin-top:4px; }
+[hidden] { display:none !important; }
+.help { font-size:13px; text-align:left; margin:10px 0 0; }
+.motion { display:flex; align-items:center; justify-content:center; gap:10px; margin:16px 0; font-size:14px; min-height:44px; }
+input[type=checkbox] { width:20px; height:20px; accent-color:var(--accent); }
+.actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.primary { background:#fff; color:#04140d; border-color:#fff; }
+#result { margin:24px 0 0; border-top:1px solid #ffffff26; padding-top:24px; }
+.store { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:12px; margin:18px 0; }
+.badge { display:inline-flex; flex-direction:column; line-height:1.05; padding:7px 15px 8px; border:1px solid #ffffff47; border-radius:10px; color:#ffffffb8; user-select:none; }
+.badge small { font-size:10px; letter-spacing:.02em; opacity:.8; }
+.badge b { font-size:18px; font-weight:500; letter-spacing:-.01em; }
+.soon { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#b5bcb8; }
+.copy { margin-top:48px; }
+.copy section { margin:0 0 40px; }
+.copy li { color:#d1d6d3; margin-bottom:10px; }
+.byline,footer { font-size:13px; color:#b5bcb8; }
+footer { padding-top:0; padding-bottom:calc(32px + env(safe-area-inset-bottom)); }
+@media(max-width:420px) { header,footer { padding-left:18px; padding-right:18px; } main { padding-left:14px; padding-right:14px; } .timer { padding:16px 12px; } .stage { height:228px; } .gem { width:202px; height:202px; } .gems { gap:5px; } .options { grid-template-columns:1fr; gap:10px; } }
+@media(prefers-reduced-motion:reduce) { .gem { transform:none !important; will-change:filter; } }
+</style>
+</head>
+<body>
+<header><nav aria-label="Main navigation"><a class="brand" href="/">GEMFLOW</a><a href="/solfeggio-frequencies/">Frequency guide</a></nav></header>
+<main>
+<div class="intro"><p class="kicker">A moment to breathe</p><h1>Free Breathing Timer</h1>
+<p class="safety">Breathe at a pace that feels comfortable. Never force your breath or hold it longer than feels natural. You can stop at any time.</p>
+<p class="safety"><a href="#breathing-safely">Breathing safely</a></p></div>
+<section class="timer" aria-label="Breathing timer">
+<noscript><p>Enable JavaScript to use the timer. You can still read the breathing patterns and safety information below.</p></noscript>
+<div class="stage" aria-hidden="true"><div class="gem" id="gem"><canvas id="crystal"></canvas></div></div>
+<p class="cue" aria-live="polite" aria-atomic="true"><span id="phase">A moment for you</span> <span id="count">Ready when you are</span></p>
+<p class="remaining">Session remaining: <span id="remaining">3:00</span></p>
+<fieldset><legend>Choose your crystal</legend><div class="gems">
+<button type="button" data-gem="ruby" aria-pressed="false"><span class="swatch" style="--stone:#ff2f5a"></span>Ruby</button>
+<button type="button" data-gem="citrine" aria-pressed="false"><span class="swatch" style="--stone:#f2c21b"></span>Citrine</button>
+<button type="button" data-gem="emerald" aria-pressed="true"><span class="swatch" style="--stone:#2fe39a"></span>Emerald</button>
+<button type="button" data-gem="sapphire" aria-pressed="false"><span class="swatch" style="--stone:#4a7dff"></span>Sapphire</button>
+<button type="button" data-gem="amethyst" aria-pressed="false"><span class="swatch" style="--stone:#b46dff"></span>Amethyst</button>
+</div></fieldset>
+<form id="settings" novalidate>
+<fieldset id="pattern-settings"><legend>Set your rhythm</legend>
+<div class="options"><label><span class="label">Breathing pattern</span><select id="pattern" aria-describedby="pattern-note"><option value="gentle">Gentle · 4 in / 6 out</option><option value="box">Box · 4-4-4-4</option><option value="478">4-7-8</option><option value="custom">Custom</option></select></label>
+<label><span class="label">Duration</span><select id="duration"><option value="1">1 minute</option><option value="3" selected>3 minutes</option><option value="5">5 minutes</option></select></label></div>
+<div id="custom" hidden>
+<label>Breathe in (seconds)<input id="in-seconds" type="number" min="2" max="10" step="1" value="4" inputmode="numeric"></label>
+<label>Hold after inhale<input id="hold-in-seconds" type="number" min="0" max="10" step="1" value="0" inputmode="numeric"></label>
+<label>Breathe out (seconds)<input id="out-seconds" type="number" min="2" max="10" step="1" value="6" inputmode="numeric"></label>
+<label>Hold after exhale<input id="hold-out-seconds" type="number" min="0" max="10" step="1" value="0" inputmode="numeric"></label>
+<p class="help">Whole seconds only: breathe in and out for 2–10 seconds; holds for 0–10 seconds. Zero skips a hold. Values outside these limits are adjusted.</p>
+</div>
+<p class="help" id="pattern-note">A gentle rhythm without breath holds. Follow only while comfortable.</p>
+<p class="help" id="adjustment" role="status"></p>
+</fieldset>
+<label class="motion"><input type="checkbox" id="reduce-motion">Reduce motion</label>
+<p class="help" id="motion-note" hidden>Your device requests reduced motion. The crystal changes brightness only.</p>
+<div class="actions"><button class="primary" id="start" type="submit" disabled>Start breathing</button><button id="pause" type="button" disabled>Pause</button><button id="end" type="button" disabled>End</button></div>
+</form>
+<div id="result" hidden><p id="closing"></p><h2>Carry a little light with you</h2><p>Explore five living crystals, music and breathing rhythms in the <a href="/">Gemflow app</a>.</p>
+<div class="store"><span class="badge" role="img" aria-label="Download on the App Store, coming soon"><small>Download on the</small><b>App Store</b></span><span class="badge" role="img" aria-label="Get it on Google Play, coming soon"><small>Get it on</small><b>Google Play</b></span><span class="soon">Coming soon</span></div></div>
+</section>
+<div class="copy">
+<section><h2>How to use the breathing timer</h2><p>Choose a crystal, a breathing pattern and a session of 1, 3 or 5 minutes. Press Start breathing and follow the words and countdown as the light grows with each inhale and settles with each exhale.</p><p>Pause whenever you like, then press Resume breathing to continue. Press End to finish at any time. Switching away from this page pauses the timer; resume when you are ready. The tool is free, with no account, ads or sound.</p></section>
+<section><h2>Choose a breathing pattern</h2><h3>Gentle · 4 in / 6 out</h3><p>Breathe in for four seconds and out for six, without holding your breath. This is the default; use Custom if you prefer shorter counts.</p><h3>Box · 4-4-4-4</h3><p>Follow four equal parts: breathe in, hold, breathe out, hold, each for four seconds. Holds are optional in your practice: switch to Gentle or set them to zero in Custom if they feel uncomfortable.</p><h3>4-7-8</h3><p>Breathe in for four seconds, hold for seven and breathe out for eight. This pattern includes a longer hold; choose it only if it feels natural, and stop or return to normal breathing whenever needed.</p><h3>Custom</h3><p>Set each part in whole seconds. Choose 2–10 seconds for each inhale and exhale, and 0–10 seconds for each hold; a zero-second hold is skipped.</p></section>
+<section id="breathing-safely"><h2>Breathing safely</h2>
+<p>This timer is designed for general relaxation and mindfulness, not medical treatment.</p>
+<p>Sit or lie down somewhere comfortable. Breathe gently and never force your breathing. If a pattern feels uncomfortable, shorten the counts, skip breath holds, or return to your normal breathing.</p>
+<p>Stop if you feel dizzy, faint, short of breath, or uncomfortable.</p>
+<p>If you have a heart or respiratory condition, or are unsure whether breath-holding exercises are suitable for you, speak with a qualified healthcare professional before trying them.</p>
+<p>Do not use this timer while driving, swimming, or operating machinery.</p></section>
+<section><h2>Safety and sources</h2><p>For more about comfortable breathing and precautions, read:</p><ul>
+<li><a href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/">NHS: Breathing exercises for stress</a></li>
+<li><a href="https://health.clevelandclinic.org/4-7-8-breathing">Cleveland Clinic: 4-7-8 breathing</a></li>
+<li><a href="https://health.clevelandclinic.org/breathwork">Cleveland Clinic: Breathwork</a></li></ul></section>
+<section><h2>Explore the Gemflow app</h2><p>The crystals are a visual focus for your practice. Discover the five stones, music and guided rhythms in <a href="/">Gemflow</a>, or read our guide to <a href="/solfeggio-frequencies/">Solfeggio frequencies</a>.</p><p class="byline">Made by Jun Hu, independent developer in Australia.</p></section>
+</div>
+</main>
+<footer>© 2026 Gemflow · <a href="mailto:hello@gemflowcrystal.com">hello@gemflowcrystal.com</a> · <a href="https://www.youtube.com/@gemflowcrystal" target="_blank" rel="noopener">YouTube</a> · <a href="/support/">Support</a> · <a href="/privacy.html">Privacy</a></footer>
+<script id="fs-emerald" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform float B; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f); vec3 q;
+  #define JH(c) jhash(c)
+  return mix(mix(JH(i),JH(i+vec2(1,0)),f.x), mix(JH(i+vec2(0,1)),JH(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
+  float t = T;
+
+  float breath = B;              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*.29 + wv2*.1;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.35) * vec2(1., .8));
+  float glow  = exp(-r1*r1*6.12);                  // 大面积柔光
+  float glowC = exp(-r1*r1*14.3);                  // 光心
+  float glow2 = exp(-r2*r2*6.53) * .3;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  // 2026-10-07 通透处理（同黄水晶定稿 K2）：光路变细变锐 + 更深处第二层（更慢、视差更大）→ 由“半透明的柔光”变为“透明的光路”
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06;                                   // 清澈 C1：去掉云雾纹理/包体
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
+  L += light * caus * .16 + light * caus2 * .07;  // 通透处理：光路。此三颗原折射纹权重只有红宝石/黄水晶的约 1/5（.06 vs .28），按比例换算到同样的视觉强度（.45 直接用会发白成闪电）
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * .85;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(0., .3, .22);
+  vec3 lit   = vec3(.02, .74, .36);
+  vec3 col = mix(dark, lit, smoothstep(0., .9, light)) * L;
+  col += vec3(.62, 1., .45) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
+  col.r += max(L - 1., 0.) * .32; col.b += max(L - 1., 0.) * .05;
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(0., .26, .17) * (1. - smoothstep(0., .7, light)) * .9;
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
+  // 清澈 C2：去掉表面柔光纱
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  // 清澈 C2：去掉倒影光团
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  // 清澈 C2：去掉边缘柔光
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.6, 1., .5) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  vec3 jN = normalize(vec3(-jg*2.2, 1.));
+  float jd1 = dot(jN, normalize(vec3(-.35, .55, 1.))), jd2 = dot(jN, normalize(vec3(.4, -.3, 1.)));
+  float jspec = smoothstep(.9965, .9992, jd1) + pow(max(jd1, 0.), 120.) * .12;           // 边缘利落的小高光 + 极淡的晕
+  float jspec2 = (smoothstep(.998, .9995, jd2) + pow(max(jd2, 0.), 200.) * .08) * .6;
+  col += vec3(.9, 1., .95) * (jspec + jspec2) * 0.;
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-citrine" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform float B; uniform vec2 P; uniform float PK;
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
+// 黄水晶 · 定稿（2026-10-07 用户选 K2）：G 的黄色 + 隐约的锐利光路两层（有纵深）
+// 来源：黄水晶_试验/黄水晶_K2.html
+// 前身 K（2026-10-07 夜，用户：J 太模糊、比第一版还差，往反方向 → 回到 G 的颜色和深度，加锐利的光路）
+//   依据：宝石显得通透/有生气靠“亮区与暗区的反差”+ 清晰的内部光路（焦散）；柔和低反差的光团 = 半透明（果冻/牛奶）
+// 前身 G（2026-10-07，用户：B–F 变成金色了，要回到最开始 A 的黄色 → 颜色全部用 A 的，保留 D–F 的利落光晕、反差、光心不发白）
+// 前身 F（2026-10-07，用户：E 背景太暗，光心不错 → 只提亮没被光照到的底色、四周少压暗；光晕宽度和光心不动 → 不会重新变糊）
+// 前身 E（2026-10-07，D 暗处偏橄榄土色、光心一大块发白 → 暗处饱和蜜琥珀、反差曲线 1.5、光心少加白）
+// 前身 D（2026-10-07，用户：黄的有点模糊 → 大光晕在黄色上变成一层雾。借绿宝石“深沉”配方：亮度反差曲线 pow 1.7、光晕收窄、四周压暗加重；光心不动）
+// 前身 C（2026-10-07，用户：B 整体不错但不通透 → 只把暗处压深：厚处多吸收红/绿，暗部底色降低；光与光心不动）
+// 前身 B（2026-10-07，A 太平、暗处芥末/橄榄、光心柠檬黄 → 厚处琥珀金、光心香槟、边缘压暗回到红宝石水平）：光形、运动与红宝石完全相同，只换颜色
+// 规则：通透；厚处深金黄、薄处香槟金；暗处不压黑（深黄压暗会发棕）；不往绿黄（荧光）或橙色走
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
+  float t = T;
+
+  float breath = B;              // 呼吸节律
+
+  // —— 光源路径与定稿相同 ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：只留很轻的低频扭曲（原来 .42+.14 的扭曲让光的轮廓本身变成了云/烟）
+  vec2 wv = vec2(fbm(uv*1.1 + vec2(t*.05, -t*.04)), fbm(uv*1.1 + vec2(7.3, 2.1) + vec2(-t*.04, t*.06))) - .5;
+  vec2 dv = uv - lp + wv*.11;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .14*sin(ang0*2. + t*.23) + .08*sin(ang0*3. - t*.31 + 1.7);
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.14) * vec2(1., .8));
+  float glow  = exp(-r1*r1*12.);                 // D：光晕收窄（红宝石 8.6）→ 边缘利落，不糊
+  float glowC = exp(-r1*r1*22.4);
+  float glow2 = exp(-r2*r2*12.) * .22;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 折射光纹：结构与运动和定稿完全一样，只在光里显现
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);               // K：光路变细变锐（G 是 6 次方 → 一片软纹）
+  // 第二层更深处的光路：更大、更慢、视差更大 → 看进宝石的体积里
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
+  float L = .05;                                   // 清澈：去掉云雾纹理/包体
+  L += light * (.72 + .1*breath);                 // K：整团光的底亮略降，把亮度让给光路（反差）
+  L += light * caus * .45 + light * caus2 * .2;   // K：光路是光里最亮、最清楚的部分
+  L += glowC * .3;                                // E：光心少加亮（D 发白成片）
+  L = max(L, 0.);
+  L = pow(L, 1.5) * 1.05;                         // D：反差曲线（同绿宝石定稿的“深沉”做法）→ 暗处更深、亮处保持
+
+  // Beer–Lambert：蓝几乎全吸收，绿只比红多吸收一点 → 厚处深金黄（G/R≈.75，色相约 45°），薄处近乎香槟白
+  float thick = mix(2.6, .5, smoothstep(0., 1.3, L));
+  vec3 absorb = vec3(.08, .19, 2.4);   // G：回到 A 的黄色   // E：厚处 G/R≈.53 蜜琥珀（比 D 暖一点，去掉橄榄味）   // C：厚处 R≈.40 G≈.24（G/R≈.6 蜜金，不到棕）；薄处仍近香槟   // 厚处 G/R≈.62（琥珀金）；薄处 G/R≈.91、蓝透得多 → 淡香槟，不是柠檬
+  vec3 col = (L*.95 + .03) * exp(-absorb*thick);
+  col += vec3(1., .95, .8) * pow(glowC, 5.) * .25;   // 极小的透亮点
+  // 光没照到的地方：饱和的金黄底色，提亮一点、不发黑不发棕
+  col += vec3(.2, .13, .0) * (1. - smoothstep(0., .7, light)) * .9;
+
+  // 抛光表面：一抹很淡的反光，随光反向移动
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
+  // 清澈：去掉表面柔光纱
+
+  // 内部反射：对侧一团淡淡的倒影光
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  // 清澈：去掉倒影光团
+
+  // 边缘内反射：边缘聚光 → 晶体体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  // 清澈：去掉边缘柔光
+
+  // 光点：数量减少，只在光附近明显
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .3) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .05 : .035;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(1., .9, .65) * motes * (.03 + .18*light);
+
+  col *= 1. - .45*smoothstep(.35, 1.2, ev);        // 边缘压暗 → 纵深（F：比 E 轻）
+
+  // 最后统一做保色相溢出：光心泛向暖香槟白，不往绿黄（荧光）走
+  float mx = max(col.b, max(col.g, col.r));
+  // 柔和压缩：亮度越高增长越慢但不截平 → 光斑内部从边缘到光心一直有渐变（不额外泛白 → 不浑）
+  vec3 hue = col / max(mx, 1e-4);
+  col = hue * (1. - exp(-mx * 1.6)) * 1.05;
+  col += vec3(1., .92, .55) * max(mx - 1., 0.) * .2;
+  // 能量源：只有很小的光心是热亮的（不整片泛白 → 不浑）
+  col = mix(col, vec3(1., .93, .66), pow(glowC, 4.) * (.32 + .08*breath));   // E：光心淡金、不发白
+
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-ruby" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform float B; uniform vec2 P; uniform float PK;
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
+// 红宝石 · 通透版（试验，由蓝宝石通透 B 换色）：光形干净、亮区不叠烟雾纹理、Beer–Lambert 上色
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
+  float t = T;
+
+  float breath = B;              // 呼吸节律
+
+  // —— 光源路径与定稿相同 ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：只留很轻的低频扭曲（原来 .42+.14 的扭曲让光的轮廓本身变成了云/烟）
+  vec2 wv = vec2(fbm(uv*1.1 + vec2(t*.05, -t*.04)), fbm(uv*1.1 + vec2(7.3, 2.1) + vec2(-t*.04, t*.06))) - .5;
+  vec2 dv = uv - lp + wv*.11;
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .14*sin(ang0*2. + t*.23) + .08*sin(ang0*3. - t*.31 + 1.7);
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*.14) * vec2(1., .8));
+  float glow  = exp(-r1*r1*8.6);                 // 半径 = 原来的 70%（系数 ×2.04）
+  float glowC = exp(-r1*r1*22.4);
+  float glow2 = exp(-r2*r2*9.4) * .26;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 折射光纹：结构与运动和定稿完全一样，只在光里显现
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  // 2026-10-07 通透处理（同黄水晶定稿 K2）：光路变细变锐 + 更深处第二层（更慢、视差更大）→ 由“半透明的柔光”变为“透明的光路”
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 亮度：平滑为主，纹理只占很小比例（不再叠花园纹 / 脉络 → 没有烟丝）
+  float L = .05;                                   // 清澈：去掉云雾纹理/包体
+  L += light * (0.72 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
+  L += light * caus * .65 + light * caus2 * .3;   // 通透2（用户：红色再通透一点）：光路 +45%
+  L += glowC * .46;
+  L = max(L, 0.);
+
+  // Beer–Lambert：越亮 = 光走的路径越短 → 厚处深皇家蓝，薄处明亮矢车菊蓝
+  float thick = mix(2.6, .5, smoothstep(0., 1.3, L));
+  vec3 absorb = vec3(.1, 2.6, 1.7);
+  absorb.b = mix(1.7, 1.45, smoothstep(.3, 1.3, L));   // 薄处蓝吸收少 → 透光偏玫瑰红（不走橙）
+  vec3 col = (L*.9 + .02) * exp(-absorb*thick);
+  col += vec3(1., .6, .7) * pow(glowC, 5.) * .25;   // 极小的透亮点
+  // 光没照到的地方：饱和的蓝宝石底色，不发黑
+  col += vec3(.17, 0., .03) * (1. - smoothstep(0., .7, light)) * .9;
+
+  // 抛光表面：一抹很淡的反光，随光反向移动
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.;
+  // 清澈：去掉表面柔光纱
+
+  // 内部反射：对侧一团淡淡的倒影光
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  // 清澈：去掉倒影光团
+
+  // 边缘内反射：边缘聚光 → 晶体体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  // 清澈：去掉边缘柔光
+
+  // 光点：数量减少，只在光附近明显
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .3) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .05 : .035;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(1., .55, .62) * motes * (.03 + .18*light);
+
+  col *= 1. - .42*smoothstep(.35, 1.2, ev);        // 边缘压暗 → 纵深
+
+  // 最后统一做保色相溢出：B 不被截断，光心泛向淡长春花白，不往青色走
+  float mx = max(col.b, max(col.g, col.r));
+  // 柔和压缩：亮度越高增长越慢但不截平 → 光斑内部从边缘到光心一直有渐变（不额外泛白 → 不浑）
+  vec3 hue = col / max(mx, 1e-4);
+  col = hue * (1. - exp(-mx * 1.6)) * 1.05;
+  col += vec3(1., .32, .5) * max(mx - 1., 0.) * .3;
+  // 能量源：只有很小的光心是热亮的（不整片泛白 → 不浑）
+  col = mix(col, vec3(1., .5, .64), pow(glowC, 4.) * (.5 + .1*breath));
+
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-sapphire" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform float B; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
+  float t = T;
+
+  float breath = B;              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*0.378 + wv2*0.126;   // 光斑 = 定稿的 90%
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*0.450) * vec2(1., .8));
+  float glow  = exp(-r1*r1*3.7);                  // 大面积柔光
+  float glowC = exp(-r1*r1*8.64);                  // 光心
+  float glow2 = exp(-r2*r2*3.95) * .3;
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  // 2026-10-07 通透处理（同黄水晶定稿 K2）：光路变细变锐 + 更深处第二层（更慢、视差更大）→ 由“半透明的柔光”变为“透明的光路”
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06;                                   // 清澈：去掉云雾纹理/包体
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
+  L += light * caus * .16 + light * caus2 * .07;  // 通透处理：光路。此三颗原折射纹权重只有红宝石/黄水晶的约 1/5（.06 vs .28），按比例换算到同样的视觉强度（.45 直接用会发白成闪电）
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * 1.2;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(0., .03, .38);
+  vec3 lit   = vec3(.08, .28, 1.);
+  vec3 col = mix(dark, lit, smoothstep(0., .9, light)) * L;
+  col += vec3(.72, .8, 1.) * glowC * glowC * (.2 + .06*breath);   // 光心透出暖白
+  col.r += max(L - 1., 0.) * .38; col.g += max(L - 1., 0.) * .3;
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(0., .08, .5) * (1. - smoothstep(0., .7, light)) * .9;
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
+  // 清澈：去掉表面柔光纱
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  // 清澈：去掉倒影光团
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  // 清澈：去掉边缘柔光
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.5, .72, 1.) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script id="fs-amethyst" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 R; uniform float T; uniform float W; uniform float B; uniform vec2 P; uniform float PK; 
+out vec4 o;
+
+float h1(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float n(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h1(i), h1(i+vec2(1,0)), f.x), mix(h1(i+vec2(0,1)), h1(i+vec2(1,1)), f.x), f.y);
+}
+float fbm(vec2 p){ float v=0., a=.5; for(int i=0;i<5;i++){ v+=a*n(p); p=p*2.02+3.1; a*=.5; } return v; }
+
+// —— 果冻：一块看不见的透明表面，大而圆润、缓缓起伏（没有刻面） ——
+float jhash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031 + .37); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }   // 手机 GPU 安全哈希
+float jn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(jhash(i),jhash(i+vec2(1,0)),f.x), mix(jhash(i+vec2(0,1)),jhash(i+vec2(1,1)),f.x), f.y); }
+float jsurf(vec2 p, float t){ return .6*jn(p*1.3 + vec2(t*.05, -t*.035)) + .4*jn(p*2.6 - vec2(t*.04, t*.055) + 7.); }
+vec2 jgrad(vec2 p, float t){ float e = .004; return vec2(jsurf(p+vec2(e,0.),t) - jsurf(p-vec2(e,0.),t), jsurf(p+vec2(0.,e),t) - jsurf(p-vec2(0.,e),t)) / (2.*e); }
+
+void main(){
+  vec2 uv = (gl_FragCoord.xy - .5*R) / R.y;
+  vec2 uv0 = uv; vec2 jg = jgrad(uv0, T);
+  uv += jg * .06;                                  // 果冻：透过起伏表面看里面的光 → 轻微折射扭曲
+  float t = T;
+
+  float breath = B;              // 呼吸节律
+
+  // —— 光源：一整团柔光在宝石里不规则地游走（几组不成倍数的正弦叠加 → 永不重复） ——
+  vec2 lp = vec2(.17*sin(t*.41) + .08*sin(t*1.07 + 1.3) + .04*sin(t*1.9 + 4.),
+                 .26*sin(t*.33 + 2.) + .10*sin(t*.87 + .5) + .05*sin(t*1.63 + 2.2));
+  lp = mix(lp, P, PK);   // 触摸：光团被手指牵引
+  // 第二团更淡的光，走另一条路，让光感更丰富
+  vec2 lp2 = vec2(.2*sin(t*.29 + 3.) + .06*sin(t*1.21), .3*sin(t*.23 + 5.) + .07*sin(t*.97 + 1.));
+
+  // 光斑形状：用缓慢变化的噪声扭曲距离场 → 轮廓不规则、随时间变形，不再是椭圆
+  vec2 wv  = vec2(fbm(uv*1.4 + vec2(t*.07, -t*.05)), fbm(uv*1.4 + vec2(7.3, 2.1) + vec2(-t*.06, t*.08))) - .5;
+  vec2 wv2 = vec2(fbm(uv*2.6 + vec2(3.1, t*.11)), fbm(uv*2.6 + vec2(-t*.09, 5.7))) - .5;
+  vec2 dv = uv - lp + wv*0.378 + wv2*0.126;   // 光斑 = 定稿的 90%
+  float ang0 = atan(dv.y, dv.x);
+  float lobes = 1. + .18*sin(ang0*2. + t*.23) + .12*sin(ang0*3. - t*.31 + 1.7);   // 缓慢变化的不对称外形
+  float r1 = length(dv * vec2(1., .8)) * lobes;
+  float r2 = length((uv - lp2 + wv*0.450) * vec2(1., .8));
+  float glow  = exp(-r1*r1*5.93);                  // 大面积柔光（紫色收小：蓝光几乎不被吸收，外围显得更大）
+  float glowC = exp(-r1*r1*12.3);                  // 光心
+  float glow2 = exp(-r2*r2*5.68) * .26;   // 第二光斑也收小
+  float light = glow + glow2;
+
+  // —— 宝石内部 ——
+  // 光的方向会让内部结构产生轻微视差：光走到哪，里面的纹理跟着微微错动
+  vec2 par = -lp * .12;
+  float deep = fbm(uv*1.2 + par + vec2(t*.01, -t*.015));
+  // 花园包体：生命般的苔藓纹理，缓慢向上生长
+  vec2 gp = uv*2.1 + par*2. + vec2(0., -t*.045);
+  vec2 w  = vec2(fbm(gp + vec2(0., t*.025)), fbm(gp + vec2(5.2, 1.3) - t*.02));
+  float garden = fbm(gp + 2.6*w);
+  float veins  = (1. - smoothstep(0., .07, abs(garden - .52)));
+  // 内部折射的柔和光纹（被光照到才显现）
+  vec2 cp = uv*3.2 + par*3. + vec2(t*.05, t*.03);
+  // 2026-10-07 通透处理（同黄水晶定稿 K2）：光路变细变锐 + 更深处第二层（更慢、视差更大）→ 由“半透明的柔光”变为“透明的光路”
+  float cn = fbm(cp + fbm(cp*.7 - t*.04)*1.5);
+  float caus  = pow(1. - abs(cn*2. - 1.), 16.);
+  vec2 cp2 = uv*1.9 + par*5. + vec2(-t*.025, t*.018) + 4.7;
+  float caus2 = pow(1. - abs(fbm(cp2 + fbm(cp2*.6 + t*.02)*1.3)*2. - 1.), 12.);
+
+  // 暗处：深邃的祖母绿，仍保留纹理
+  float L = .06;                                   // 清澈：去掉云雾纹理/包体
+  // 被光透过的区域：整块发亮，同时照出内部的包体与光纹
+  L += light * (0.58 + .1*breath);   // 通透处理：整团光底亮 −.04，亮度让给光路（同 K2）
+  float clearZ = smoothstep(.3, .9, light);                     // 玻璃感：受光区清澈，不带云雾
+  L += light * caus * .24 + light * caus2 * .1;   // 通透2（用户：紫色再通透一点）：光路 +50%
+  L += glowC * .32;
+  L = max(L, .03);
+  L = pow(L, 1.8) * 1.25;                        // 压深暗部、保留光心 → 深沉又通透
+
+  // 颜色：暗部偏深蓝绿，受光处转向鲜亮的翠绿，光心透出嫩绿白 —— 像生命在发光
+  vec3 dark  = vec3(.13, 0., .3);
+  vec3 lit   = mix(vec3(.42, .06, 1.), vec3(.66, .04, .92), smoothstep(.35, .65, deep));   // 二色性：蓝紫 ↔ 红紫
+  // 比尔-朗伯透光：光在宝石里走得越远，被吸收得越多 → 厚处深而纯，薄处（光心）透亮偏白
+  float thick = mix(2.4, .45, smoothstep(.12, 1.4, L)) * (.9 + .2*deep);   // 光心更"薄" → 更透
+  // 红、蓝同比例吸收，再乘紫水晶固定色调 → 从暗到光心色相始终一致，只有明暗/白度变化
+  vec3 col = (L*1.21 + .05) * exp(-vec3(.22, 2.6, .22) * thick) * vec3(.64, 1., 1.);   // 光斑提亮约 10%
+  col += vec3(.78, .64, 1.) * glowC * glowC * (.2 + .06*breath);   // 带紫的白   // 光心透出暖白
+  col.g += max(L - 1., 0.) * .2; col.r += max(L - 1., 0.) * .1;   // 红绿一起溢出，保持紫色平衡
+  // 光没照到的地方：不要发黑，保留一层饱和的宝石蓝底色（带一点内部纹理）
+  col += vec3(.22, .0, .3) * (1. - smoothstep(0., .7, light)) * .9;
+
+  // 抛光表面：一抹很淡的反光，随光反向移动（表面与内部的视差 → 玻璃体积感）
+  float shd = dot(uv + lp*.35, normalize(vec2(1., .5))) * 3.; float sh = exp(-shd*shd);
+  // 清澈：去掉表面柔光纱
+
+  // 内部反射：光在宝石里来回反射，在对侧映出一团淡淡的“倒影光”
+  float rm = length((uv + lp*.85) * vec2(1., .8));
+  // 清澈：去掉倒影光团
+
+  // 边缘内反射：宝石的边缘会聚光发亮，而不是发暗 → 整块晶体的体积感
+  float ev = length(uv*vec2(1.1,.8));
+  float rimSide = .55 + .45*dot(normalize(uv + 1e-4), normalize(lp + 1e-4));
+  // 清澈：去掉边缘柔光
+
+  // 上升的生命光点：靠近光的地方更亮
+  float motes = 0.;
+  for (int k=0; k<2; k++) {
+    float sc = k==0 ? 7. : 13.;
+    float spd = k==0 ? .07 : .045;
+    vec2 g = uv*sc + vec2(float(k)*3.7, -t*spd*sc);
+    vec2 id = floor(g);
+    for (int j=-1;j<=1;j++) for (int i=-1;i<=1;i++){
+      vec2 c = id + vec2(i,j);
+      float r = h1(c + float(k)*11.);
+      if (r > .55) continue;
+      vec2 o2 = vec2(h1(c*1.7), h1(c*2.3));
+      o2.x += .15*sin(t*.8 + r*30.);
+      vec2 d = g - c - o2;
+      float tw = .5 + .5*sin(t*(1. + 2.*r) + r*50.);
+      float size = k==0 ? .06 : .04;
+      motes += tw * (size*size) / (dot(d,d) + size*size*.3) * (k==0 ? .55 : .35);
+    }
+  }
+  col += vec3(.85, .6, 1.) * motes * (.06 + .2*light);
+
+  col *= 1. - .15*smoothstep(.6, 1.2, ev);
+  col *= smoothstep(0., 1., W*1.4 - length(uv)*.6);
+  // 控制冲白的程度：光心可以亮成很淡、很透的紫白，但绿通道不超过蓝的 62% → 不会变成纯白
+  // 保持色相：亮到顶时等比例收住（红蓝比例不变），多出的亮度只以淡紫白叠加 → 光心不滑向粉红
+  float mxv = max(col.r, max(col.g, col.b));
+  if (mxv > 1.) col = col / mxv + vec3(.72, .62, 1.) * (mxv - 1.) * .3;
+  col.g = min(col.g, .52 * max(col.b, col.r*.9));
+  o = vec4(min(col, 1.), 1.);
+}
+</script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const presets = { gentle:[4,0,6,0], box:[4,4,4,4], '478':[4,7,8,0] };
+const fields = ['in-seconds','hold-in-seconds','out-seconds','hold-out-seconds'];
+const labels = ['Breathe in','Hold','Breathe out','Hold'];
+const colors = { ruby:'#ff2f5a', citrine:'#f2c21b', emerald:'#2fe39a', sapphire:'#4a7dff', amethyst:'#b46dff' };
+const media = matchMedia('(prefers-reduced-motion: reduce)');
+let selectedGem = 'emerald', state = 'idle', elapsed = 0, anchor = 0, total = 180;
+let rhythm = presets.gentle.slice(), reduced = media.matches;
+let lastCue = '', lastFrame = -Infinity, visualTime = 0, previousTime = performance.now(), lastPaint = '';
+$('reduce-motion').checked = media.matches;
+function syncMotion() {
+  // The OS preference always wins, even if the manual switch is off.
+  reduced = media.matches || $('reduce-motion').checked;
+  $('motion-note').hidden = !media.matches;
+}
+if (media.addEventListener) media.addEventListener('change', syncMotion);
+else media.addListener(syncMotion);
+$('reduce-motion').addEventListener('change', syncMotion);
+syncMotion();
+function customRhythm() {
+  let adjusted = false;
+  const values = fields.map((id,i) => {
+    const input = $(id), raw = input.value.trim();
+    const numeric = raw === '' ? NaN : Number(raw);
+    const minimum = i % 2 === 0 ? 2 : 0;
+    const value = Math.max(minimum, Math.min(10, Math.round(Number.isFinite(numeric) ? numeric : presets.gentle[i])));
+    if (!Number.isFinite(numeric) || numeric !== value) adjusted = true;
+    input.value = String(value);
+    return value;
+  });
+  $('adjustment').textContent = adjusted ? 'Counts adjusted to whole seconds: in/out 2–10, holds 0–10.' : '';
+  return values;
+}
+fields.forEach(id => $(id).addEventListener('change', customRhythm));
+function settingsChanged() {
+  $('custom').hidden = $('pattern').value !== 'custom';
+  const holds = $('pattern').value === 'box' || $('pattern').value === '478';
+  $('pattern-note').textContent = holds ? 'This pattern includes breath holds. Never strain; choose Gentle or skip holds in Custom if needed.' : $('pattern').value === 'custom' ? 'Choose a comfortable rhythm. Set either hold to zero to skip it.' : 'A gentle rhythm without breath holds. Follow only while comfortable.';
+  total = Number($('duration').value) * 60;
+  if (state === 'idle') $('remaining').textContent = formatTime(total);
+}
+$('pattern').addEventListener('change', settingsChanged);
+$('duration').addEventListener('change', settingsChanged);
+function formatTime(seconds) {
+  const whole = Math.max(0, Math.ceil(seconds));
+  return Math.floor(whole / 60) + ':' + String(whole % 60).padStart(2,'0');
+}
+function phaseAt(seconds) {
+  const cycle = rhythm.reduce((sum,n) => sum+n,0);
+  let position = seconds % cycle;
+  for (let i=0; i<rhythm.length; i++) {
+    if (rhythm[i] === 0) continue;
+    if (position < rhythm[i]) return { index:i, left:Math.ceil(rhythm[i]-position), progress:position/rhythm[i] };
+    position -= rhythm[i];
+  }
+  return { index:0, left:rhythm[0], progress:0 };
+}
+function nowElapsed(now) { return elapsed + (state === 'running' ? (now-anchor)/1000 : 0); }
+function cue(title, detail) {
+  const key = title + detail;
+  if (lastCue === key) return;
+  $('phase').textContent = title;
+  $('count').textContent = detail;
+  lastCue = key;
+}
+function buttons() {
+  $('pattern-settings').disabled = state !== 'idle';
+  $('start').disabled = state === 'running';
+  $('start').textContent = state === 'paused' ? 'Resume breathing' : 'Start breathing';
+  $('pause').disabled = state !== 'running';
+  $('end').disabled = state === 'idle';
+}
+function finish(completed) {
+  state = 'idle'; elapsed = 0;
+  cue(completed ? 'Session complete' : 'Session ended', 'Return to your natural breath');
+  $('remaining').textContent = completed ? '0:00' : formatTime(total);
+  $('closing').textContent = 'Take your time. Let your breathing find its own rhythm.';
+  $('result').hidden = false;
+  buttons();
+}
+$('settings').addEventListener('submit', event => {
+  event.preventDefault();
+  if (state === 'running') return;
+  if (state === 'idle') {
+    rhythm = $('pattern').value === 'custom' ? customRhythm() : presets[$('pattern').value].slice();
+    total = Number($('duration').value) * 60;
+    elapsed = 0; visualTime = 0;
+    $('result').hidden = true;
+  }
+  anchor = performance.now(); state = 'running';
+  buttons(); update(anchor);
+});
+function pause(background) {
+  if (state !== 'running') return;
+  const now = performance.now();
+  elapsed = Math.min(total, nowElapsed(now));
+  if (elapsed >= total) { finish(true); return; }
+  state = 'paused'; buttons();
+  const phase = phaseAt(elapsed);
+  cue(background ? 'Paused while away' : 'Paused', labels[phase.index] + ' · ' + phase.left + ' seconds left');
+}
+$('pause').addEventListener('click', () => pause(false));
+$('end').addEventListener('click', () => { if (state !== 'idle') finish(false); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) pause(true); });
+document.querySelectorAll('[data-gem]').forEach(button => button.addEventListener('click', () => {
+  selectedGem = button.dataset.gem;
+  document.documentElement.style.setProperty('--accent', colors[selectedGem]);
+  document.querySelectorAll('[data-gem]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+}));
+// Reuse the homepage's five fragment shaders and their original color palettes.
+const canvas = $('crystal');
+let gl = null, programs = {}, ready = false;
+function fallback() { ready = false; canvas.hidden = true; $('gem').style.borderRadius = '50%'; }
+function initGL() {
+  lastPaint = '';
+  try {
+    gl = canvas.getContext('webgl2', { antialias:false, powerPreference:'low-power' });
+    if (!gl) { fallback(); return; }
+    const compile = (kind, source) => {
+      const shader = gl.createShader(kind);
+      gl.shaderSource(shader, source); gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { gl.deleteShader(shader); throw new Error('Shader unavailable'); }
+      return shader;
+    };
+    const vertex = compile(gl.VERTEX_SHADER, '#version 300 es\nin vec2 a; void main(){ gl_Position = vec4(a,0,1); }');
+    programs = {};
+    Object.keys(colors).forEach(id => {
+      const fragment = compile(gl.FRAGMENT_SHADER, $('fs-'+id).textContent.trim());
+      const program = gl.createProgram();
+      gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.bindAttribLocation(program,0,'a'); gl.linkProgram(program);
+      gl.deleteShader(fragment);
+      if (!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error('Crystal unavailable');
+      const uniform = name => gl.getUniformLocation(program,name);
+      programs[id] = { program, R:uniform('R'), T:uniform('T'), W:uniform('W'), P:uniform('P'), PK:uniform('PK'), B:uniform('B') };
+    });
+    gl.deleteShader(vertex);
+    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+    ready = true; canvas.hidden = false; $('gem').style.borderRadius = '';
+  } catch (_) { fallback(); }
+}
+canvas.addEventListener('webglcontextlost', event => { event.preventDefault(); fallback(); });
+canvas.addEventListener('webglcontextrestored', initGL);
+initGL();
+function paint(level) {
+  const smooth = level*level*(3-2*level);
+  const ratio = Math.min(devicePixelRatio || 1,1.5);
+  const width = Math.max(1,Math.round(canvas.clientWidth*ratio));
+  const height = Math.max(1,Math.round(canvas.clientHeight*ratio));
+  const key = [selectedGem, reduced, smooth, reduced ? 0 : visualTime, width, height, ready].join(':');
+  if (key === lastPaint) return;
+  lastPaint = key;
+  $('gem').style.transform = reduced ? 'none' : 'scale(' + (.80 + .20*smooth) + ')';
+  $('gem').style.filter = 'brightness(' + (.70 + .55*smooth) + ')';
+  if (!ready) return;
+  if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+  gl.viewport(0,0,width,height);
+  const p = programs[selectedGem]; gl.useProgram(p.program);
+  gl.uniform2f(p.R,width,height); gl.uniform1f(p.T,reduced ? 0 : visualTime);
+  gl.uniform1f(p.W,1); gl.uniform2f(p.P,0,0); gl.uniform1f(p.PK,0); gl.uniform1f(p.B,smooth);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+}
+function update(now) {
+  const seconds = Math.min(total,nowElapsed(now));
+  if (state === 'running' && seconds >= total) finish(true);
+  let level = .3;
+  if (state !== 'idle') {
+    const phase = phaseAt(seconds);
+    if (state === 'running') {
+      cue(labels[phase.index], phase.left + (phase.left === 1 ? ' second' : ' seconds'));
+      $('remaining').textContent = formatTime(total-seconds);
+    }
+    level = phase.index === 0 ? phase.progress : phase.index === 1 ? 1 : phase.index === 2 ? 1-phase.progress : 0;
+  }
+  paint(level);
+}
+function frame(now) {
+  if (now-lastFrame >= 1000/30 && !document.hidden) {
+    if (state === 'running' && !reduced) visualTime += Math.min((now-previousTime)/1000,.1);
+    update(now); lastFrame = now;
+    previousTime = now;
+  }
+  requestAnimationFrame(frame);
+}
+buttons(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
